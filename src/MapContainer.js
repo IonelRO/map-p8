@@ -72,13 +72,27 @@ constructor(props) {
           zoom={15}
           onClick={this.onMapClicked}
         >
-      <Marker onClick={this.onMarkerClick}
-                name={'Current location'} />
-      <InfoWindow onClose={this.onInfoWindowClose}>
-            <div>
-            <h1>{this.state.selectedPlace.name}</h1>
-            </div>
-        </InfoWindow>
+  <Marker
+    title={'Tirgu Jiu monuments.'}
+    name={'Endless column'}
+    position={{lat: 45.037426, lng: 23.285344}} />
+  <Marker
+    name={'The gate of the kiss'}
+    position={{lat: 45.039405, lng: 23.268641}} />
+  <Marker />
+  <Marker
+    name={'The Table of Silence'}
+    position={{lat: 45.039638, lng: 23.266628}} />
+  <Marker
+    name={'Chairs Street'}
+    position={{lat: 45.039585, lng: 23.267191}} />
+  <Marker
+    name={'Gorj County Museum'}
+    position={{lat: 45.0392, lng: 23.276107}} />
+  <Marker
+    name={'Saints Peter and Paul Church'}
+    position={{lat: 45.038293, lng: 23.27872}} />    
+
       </Map>
       </div>
     </div>        
