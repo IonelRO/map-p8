@@ -3,7 +3,9 @@ import logo from './logo.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 export class MapContainer extends React.Component {
 state = {
-    selectedPlace:{lat: 45.039638, lng: 23.266628}    
+    showingInfoWindow: false,
+    activeMarker: {},
+    selectedPlace: {}    
   }
   
 constructor(props) {
@@ -22,6 +24,16 @@ constructor(props) {
       showingInfoWindow: true
     });
   }
+
+  onMapClicked = (props) => {
+    if (this.state.showingInfoWindow) {
+      this.setState({
+        showingInfoWindow: false,
+        activeMarker: null
+      })
+    }
+  };
+
   render() {
     return (
       <div className="App">
@@ -65,6 +77,7 @@ constructor(props) {
        <div id="map">
        <Map
           google={this.props.google}
+          onClick={this.onMapClicked}
            initialCenter={{
             lat: 45.039638,
             lng: 23.266628
@@ -72,26 +85,35 @@ constructor(props) {
           zoom={15}
           onClick={this.onMapClicked}
         >
-  <Marker
-    title={'Tirgu Jiu monuments.'}
+  <Marker onClick={this.onMarkerClick}
+    title={'Endless column'}
     name={'Endless column'}
     position={{lat: 45.037426, lng: 23.285344}} />
-  <Marker
+  <Marker onClick={this.onMarkerClick}
+  	title={'The gate of the kiss'}
     name={'The gate of the kiss'}
     position={{lat: 45.039405, lng: 23.268641}} />
   <Marker />
-  <Marker
+  <Marker onClick={this.onMarkerClick}
     name={'The Table of Silence'}
     position={{lat: 45.039638, lng: 23.266628}} />
-  <Marker
+  <Marker onClick={this.onMarkerClick}
     name={'Chairs Street'}
     position={{lat: 45.039585, lng: 23.267191}} />
-  <Marker
+  <Marker onClick={this.onMarkerClick}
     name={'Gorj County Museum'}
     position={{lat: 45.0392, lng: 23.276107}} />
-  <Marker
+  <Marker onClick={this.onMarkerClick}
     name={'Saints Peter and Paul Church'}
     position={{lat: 45.038293, lng: 23.27872}} />    
+
+    <InfoWindow
+          marker={this.state.activeMarker}
+          visible={this.state.showingInfoWindow}>
+            <div>
+              <h1>{this.state.selectedPlace.name}</h1>
+            </div>
+     </InfoWindow>
 
       </Map>
       </div>
