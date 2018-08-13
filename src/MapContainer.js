@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import data from './data';
 class MapContainer extends Component {
 
   state = {
@@ -10,6 +11,16 @@ class MapContainer extends Component {
       showingInfoWindow: false
       
   };
+  makeMarkerIcon(markerColor) {
+    const markerImage = new window.google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor + '|40|_|%E2%80%A2',
+      new window.google.maps.Size(21, 34),//This marker is 21 pixels wide by 34 pixels high
+      new window.google.maps.Point(0, 0),//The origin for this image is (0, 0)
+      new window.google.maps.Point(10, 34),//The anchor for this image is (10, 34)
+      new window.google.maps.Size(21,34)//scaledSize
+    );
+    return markerImage;
+  }
 
  constructor(props) {
     super(props);
@@ -37,8 +48,9 @@ class MapContainer extends Component {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
-        activeMarker: null
-
+        activeMarker: null,
+        fillColor: {},
+        
       })
     }
   };
@@ -47,10 +59,13 @@ class MapContainer extends Component {
   		this.setState({
       selectedPlace: props,
       activeMarker: marker,
-      showingInfoWindow: true    
+      showingInfoWindow: true,
+      icon: 'markerColor'    
     });
 	};
  
+	
+
   render() {
      const myMarkers = [
         {title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
@@ -115,7 +130,7 @@ class MapContainer extends Component {
         <Marker key={myMarker.name}
                                
                                 onClick={this.onMarkerClick}
-                              //  onMouseover={this.onMouseoverMarker}
+                                onMouseover={this.onMouseoverMarker}
                                 position={myMarker.position}
                                 title={myMarker.title}
                                 name={myMarker.name}                               
@@ -125,6 +140,7 @@ class MapContainer extends Component {
     <InfoWindow
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}>
+
             <div>
               <h1>{this.state.selectedPlace.name}</h1>
             </div>
