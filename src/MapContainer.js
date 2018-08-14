@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
-import * as data from './data';
+
 class MapContainer extends Component {
 
 
@@ -12,10 +12,36 @@ constructor(props) {
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
     this.state = {
       showingInfoWindow: false,
+      selectedPlace: {},
       activeMarker: {},
-      selectedPlace: {}
+      venues: []
     };
   }
+  
+   componentDidMount() {
+        //Get 6 FourSquare (third party) API details
+        const url = 'https://api.foursquare.com/v2/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628';
+        fetch(url)
+            .then(data => {
+                if (data.ok) {
+                    //console.log(data.json());
+                    return data.json();
+                } else {
+                    throw new Error(data.statusText)
+                }
+            })
+            .then(data => {
+                const venues = data.response["venues"];
+                this.setState({ venues: venues });
+                this.Map();
+                this.onclickLocation()
+            })
+            .catch(err => {
+                this.setState({ error: err.toString() })
+            })
+    }
+
+
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
@@ -29,8 +55,8 @@ constructor(props) {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
-        activeMarker: null,
-        fillColor: {},
+        activeMarker: null
+       
 
       })
     }
@@ -56,14 +82,14 @@ constructor(props) {
 
 
   render() {
-     const myMarkers = [
-        {id:'ChIJzfT-fWqKTUcRnrl89u6v4TE', title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
-        {id:'ChIJCUZ-MmeKTUcRVvFxlambvOUtitle', title: 'The gate of the kiss', name:'The gate of the kiss', position: {lat: 45.039405, lng: 23.268641,}},
-        {id:'ChIJY3IW52CKTUcRqIdjh9CM0CI', title: 'The Table of Silence', name:'The Table of Silence', position: {lat: 45.039638, lng: 23.266628}},
-        {id:'ChIJkWy20WCKTUcRTgbOJzqzDuk', title: 'Chairs Street', name:'Chairs Street', position: {lat: 45.039585, lng: 23.267191}},
-        {id:'ChIJG2hvBmiKTUcR4Zwsh_8J_oA', title: 'Gorj County Museum', name:'Gorj County Museum', position: {lat: 45.0392, lng: 23.276107}},
-        {id:'ChIJ_SXJzGmKTUcRpRJO0vXWc2k', title: 'Saints Peter and Paul Church', name:'Saints Peter and Paul Church', position: {lat: 45.038293, lng: 23.27872}}
-       ]
+     // const myMarkers = [
+      //  {id:'ChIJzfT-fWqKTUcRnrl89u6v4TE', title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
+      //  {id:'ChIJCUZ-MmeKTUcRVvFxlambvOUtitle', title: 'The gate of the kiss', name:'The gate of the kiss', position: {lat: 45.039405, lng: 23.268641,}},
+      //  {id:'ChIJY3IW52CKTUcRqIdjh9CM0CI', title: 'The Table of Silence', name:'The Table of Silence', position: {lat: 45.039638, lng: 23.266628}},
+      //  {id:'ChIJkWy20WCKTUcRTgbOJzqzDuk', title: 'Chairs Street', name:'Chairs Street', position: {lat: 45.039585, lng: 23.267191}},
+      //  {id:'ChIJG2hvBmiKTUcR4Zwsh_8J_oA', title: 'Gorj County Museum', name:'Gorj County Museum', position: {lat: 45.0392, lng: 23.276107}},
+      //  {id:'ChIJ_SXJzGmKTUcRpRJO0vXWc2k', title: 'Saints Peter and Paul Church', name:'Saints Peter and Paul Church', position: {lat: 45.038293, lng: 23.27872}}
+      // ]
 
      return (
       <div className="App">
@@ -115,30 +141,28 @@ constructor(props) {
           }}
           zoom={15}
         >
-        {myMarkers.map(myMarker =>
+        {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
                                 onMouseover={this.onMouseoverMarker}
                                 onClick={this.onMarkerClick}
 
-                                position={myMarker.position}
-                                title={myMarker.title}
-                                icon={this.props.markerImage}
+                                position={myMarker.location}
+                                title={myMarker.name}
+                                icon={this.state.MarkerImage}
                                 name={myMarker.name}
                                 animation={this.props.google.maps.Animation.DROP}
                             />
          )}
-    <InfoWindow
+      <InfoWindow
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}>
 
             <div>
-              <h1>{this.state.selectedPlace.name}
-              <img src={this.state.selectedPlace.photo_reference}/>
+              <h1>{this.state.selectedPlace.name}              
 
               </h1>
             </div>
-     </InfoWindow>
-
+     </InfoWindow>      
       </Map>
       </div>
     </div>
