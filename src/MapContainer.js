@@ -1,38 +1,19 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
-import data from './data';
+import * as data from './data';
 class MapContainer extends Component {
 
-  state = {
-      markerData: [],
-      activeMarker: {},
-      activeMarkerIndex: false,
-      selectedPlace: {},
-      showingInfoWindow: false
 
-  };
-  makeMarkerIcon(markerColor) {
-    const markerImage = new window.google.maps.MarkerImage(
-      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor + '|40|_|%E2%80%A2',
-      new window.google.maps.Size(21, 34),//This marker is 21 pixels wide by 34 pixels high
-      new window.google.maps.Point(0, 0),//The origin for this image is (0, 0)
-      new window.google.maps.Point(10, 34),//The anchor for this image is (10, 34)
-      new window.google.maps.Size(21,34)//scaledSize
-    );
-    return markerImage;
-  }
-
- constructor(props) {
+constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
     this.state = {
       showingInfoWindow: false,
-
       activeMarker: {},
-      selectedPlace: {},
-      fillColor: {}
+      selectedPlace: {}
     };
   }
   onMarkerClick(props, marker, e) {
@@ -42,7 +23,7 @@ class MapContainer extends Component {
       showingInfoWindow: true
 
     });
-  }
+  };
 
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
@@ -60,20 +41,28 @@ class MapContainer extends Component {
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true,
-      icon: 'markerColor'
     });
 	};
-
+  makeMarkerIcon(markerColor) {
+    const markerImage = new window.google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor + '|40|_|%E2%80%A2',
+      new window.google.maps.Size(21, 34),//This marker is 21 pixels wide by 34 pixels high
+      new window.google.maps.Point(0, 0),//The origin for this image is (0, 0)
+      new window.google.maps.Point(10, 34),//The anchor for this image is (10, 34)
+      new window.google.maps.Size(21,34)//scaledSize
+    );
+    return markerImage;
+  }
 
 
   render() {
      const myMarkers = [
-        {title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
-        {title: 'The gate of the kiss', name:'The gate of the kiss', position: {lat: 45.039405, lng: 23.268641,}},
-        {title: 'The Table of Silence', name:'The Table of Silence', position: {lat: 45.039638, lng: 23.266628}},
-        {title: 'Chairs Street', name:'Chairs Street', position: {lat: 45.039585, lng: 23.267191}},
-        {title: 'Gorj County Museum', name:'Gorj County Museum', position: {lat: 45.0392, lng: 23.276107}},
-        {title: 'Saints Peter and Paul Church', name:'aints Peter and Paul Church', position: {lat: 45.038293, lng: 23.27872}}
+        {id:'ChIJzfT-fWqKTUcRnrl89u6v4TE', title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
+        {id:'ChIJCUZ-MmeKTUcRVvFxlambvOUtitle', title: 'The gate of the kiss', name:'The gate of the kiss', position: {lat: 45.039405, lng: 23.268641,}},
+        {id:'ChIJY3IW52CKTUcRqIdjh9CM0CI', title: 'The Table of Silence', name:'The Table of Silence', position: {lat: 45.039638, lng: 23.266628}},
+        {id:'ChIJkWy20WCKTUcRTgbOJzqzDuk', title: 'Chairs Street', name:'Chairs Street', position: {lat: 45.039585, lng: 23.267191}},
+        {id:'ChIJG2hvBmiKTUcR4Zwsh_8J_oA', title: 'Gorj County Museum', name:'Gorj County Museum', position: {lat: 45.0392, lng: 23.276107}},
+        {id:'ChIJ_SXJzGmKTUcRpRJO0vXWc2k', title: 'Saints Peter and Paul Church', name:'Saints Peter and Paul Church', position: {lat: 45.038293, lng: 23.27872}}
        ]
 
      return (
@@ -127,12 +116,13 @@ class MapContainer extends Component {
           zoom={15}
         >
         {myMarkers.map(myMarker =>
-        <Marker key={myMarker.name}
-
-                                onClick={this.onMarkerClick}
+        <Marker key={myMarker.id}
                                 onMouseover={this.onMouseoverMarker}
+                                onClick={this.onMarkerClick}
+
                                 position={myMarker.position}
                                 title={myMarker.title}
+                                icon={this.props.markerImage}
                                 name={myMarker.name}
                                 animation={this.props.google.maps.Animation.DROP}
                             />
@@ -142,7 +132,10 @@ class MapContainer extends Component {
           visible={this.state.showingInfoWindow}>
 
             <div>
-              <h1>{this.state.selectedPlace.name}</h1>
+              <h1>{this.state.selectedPlace.name}
+              <img src={this.state.selectedPlace.photo_reference}/>
+
+              </h1>
             </div>
      </InfoWindow>
 

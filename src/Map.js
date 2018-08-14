@@ -1,27 +1,59 @@
+import React, {PropTypes, Component} from 'react/addons';
+import shouldPureComponentUpdate from 'react-pure-render/function';
 
-import React, { Component } from 'react';
-class MapContainer extends React.Component {
-import {
-  withScriptjs,
-  withGoogleMap,
-  GoogleMap,
-  Marker,
-} from "react-google-maps";
+import GoogleMap from 'google-map-react';
+import MyGreatPlace from './my_great_place.jsx';
 
-const MapWithAMarker = withScriptjs(withGoogleMap(props =>
-  <GoogleMap
-    defaultZoom={8}
-    defaultCenter={{ lat: -34.397, lng: 150.644 }}
-  >
-    <Marker
-      position={{ lat: -34.397, lng: 150.644 }}
-    />
-  </GoogleMap>
-));
+function createMapOptions(maps) {
+  // next props are exposed at maps
+  // "Animation", "ControlPosition", "MapTypeControlStyle", "MapTypeId",
+  // "NavigationControlStyle", "ScaleControlStyle", "StrokePosition", "SymbolPath", "ZoomControlStyle",
+  // "DirectionsStatus", "DirectionsTravelMode", "DirectionsUnitSystem", "DistanceMatrixStatus",
+  // "DistanceMatrixElementStatus", "ElevationStatus", "GeocoderLocationType", "GeocoderStatus", "KmlLayerStatus",
+  // "MaxZoomStatus", "StreetViewStatus", "TransitMode", "TransitRoutePreference", "TravelMode", "UnitSystem"
+  return {
+    zoomControlOptions: {
+      position: maps.ControlPosition.RIGHT_CENTER,
+      style: maps.ZoomControlStyle.SMALL
+    },
+    mapTypeControlOptions: {
+      position: maps.ControlPosition.TOP_RIGHT
+    },
+    mapTypeControl: true
+  };
+}
 
-<MapWithAMarker
-  googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places"
-  loadingElement={<div style={{ height: `100%` }} />}
-  containerElement={<div style={{ height: `400px` }} />}
-  mapElement={<div style={{ height: `100%` }} />}
-/>
+export default class SimpleMapPage extends Component {
+  static propTypes = {
+    center: PropTypes.array,
+    zoom: PropTypes.number,
+    greatPlaceCoords: PropTypes.any
+  };
+
+  static defaultProps = {
+    center: [59.938043, 30.337157],
+    zoom: 9,
+    greatPlaceCoords: {lat: 59.724465, lng: 30.080121}
+  };
+
+  shouldComponentUpdate = shouldPureComponentUpdate;
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+       <GoogleMap
+       apiKey: "AIzaSyB7Ma3Ggl2TFUdsMaW8E4_F62uR65DPHZQ",
+       v: "3.30"
+        // apiKey={YOUR_GOOGLE_MAP_API_KEY} // set if you need stats etc ...
+        center={this.props.center}
+        zoom={this.props.zoom}
+        options={createMapOptions}>
+        <MyGreatPlace lat={59.955413} lng={30.337844} text={'A'} /* Kreyser Avrora */ />
+        <MyGreatPlace {...this.props.greatPlaceCoords} text={'B'} /* road circle */ />
+      </GoogleMap>
+    );
+  }
+}
