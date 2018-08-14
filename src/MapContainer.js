@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 export class MapContainer extends React.Component {
 state = {
     showingInfoWindow: false,
     activeMarker: {},
-    selectedPlace: {}    
+    selectedPlace: {}
   }
-  
+
 constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
@@ -37,16 +36,16 @@ constructor(props) {
   render() {
     return (
       <div className="App">
-        
- 
-    <div class="container">
-      <div class="options-box">
+
+
+    <div className="container">
+      <div className="options-box">
         <h1>Târgu Jiu - Brîncuși - Home town</h1>
         <div>
           <input id="show-listings" type="button" value="Show Listings"/>
           <input id="hide-listings" type="button" value="Hide Listings"/>
           <hr/>
-          <span class="text"> Draw a shape to search within it for homes!</span>
+          <span className="text"> Draw a shape to search within it for homes!</span>
           <input id="toggle-drawing"  type="button" value="Drawing Tools"/>
         </div>
         <hr/>
@@ -56,7 +55,7 @@ constructor(props) {
         </div>
         <hr/>
         <div>
-          <span class="text"> Within </span>
+          <span className="text"> Within </span>
           <select id="max-duration">
             <option value="10">10 min</option>
             <option value="15">15 min</option>
@@ -69,7 +68,7 @@ constructor(props) {
             <option value="BICYCLING">bike</option>
             <option value="TRANSIT">transit ride</option>
           </select>
-          <span class="text">of</span>
+          <span>of</span>
           <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY"/>
           <input id="search-within-time" type="button" value="Go"/>
         </div>
@@ -77,11 +76,10 @@ constructor(props) {
        <div id="map">
        <Map
           google={this.props.google}
-          onClick={this.onMapClicked}
            initialCenter={{
             lat: 45.039638,
             lng: 23.266628
-          }}          
+          }}
           zoom={15}
           onClick={this.onMapClicked}
         >
@@ -105,7 +103,7 @@ constructor(props) {
     position={{lat: 45.0392, lng: 23.276107}} />
   <Marker onClick={this.onMarkerClick}
     name={'Saints Peter and Paul Church'}
-    position={{lat: 45.038293, lng: 23.27872}} />    
+    position={{lat: 45.038293, lng: 23.27872}} />
 
     <InfoWindow
           marker={this.state.activeMarker}
@@ -117,9 +115,9 @@ constructor(props) {
 
       </Map>
       </div>
-    </div>        
+    </div>
       </div>
-      
+
     );
   }
 }
