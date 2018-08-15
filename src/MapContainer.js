@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-
+import logo from './media/camera.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import './App.css';
 
 class MapContainer extends Component {
 
@@ -10,10 +11,12 @@ constructor(props) {
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
+
     this.state = {
       showingInfoWindow: false,
       selectedPlace: {},
       activeMarker: {},
+      icon: {},
       venues: []
     };
   }
@@ -42,12 +45,14 @@ constructor(props) {
     }
 
 
+
+
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
-      showingInfoWindow: true
-
+      showingInfoWindow: true,
+      icon: logo
     });
   };
 
@@ -56,7 +61,7 @@ constructor(props) {
       this.setState({
         showingInfoWindow: false,
         activeMarker: null
-       
+        
 
       })
     }
@@ -67,19 +72,10 @@ constructor(props) {
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true,
+      
     });
 	};
-  makeMarkerIcon(markerColor) {
-    const markerImage = new window.google.maps.MarkerImage(
-      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor + '|40|_|%E2%80%A2',
-      new window.google.maps.Size(21, 34),//This marker is 21 pixels wide by 34 pixels high
-      new window.google.maps.Point(0, 0),//The origin for this image is (0, 0)
-      new window.google.maps.Point(10, 34),//The anchor for this image is (10, 34)
-      new window.google.maps.Size(21,34)//scaledSize
-    );
-    return markerImage;
-  }
-
+ 
 
   render() {
      // const myMarkers = [
@@ -134,7 +130,7 @@ constructor(props) {
        <Map
 
           google={this.props.google}
-          onMapClicked={this.props.onMapClicked}
+          onClick={this.onMapClicked}
            initialCenter={{
             lat: 45.039638,
             lng: 23.266628
@@ -143,26 +139,33 @@ constructor(props) {
         >
         {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
-                                onMouseover={this.onMouseoverMarker}
+                               // onMouseover={this.onMouseoverMarker}
                                 onClick={this.onMarkerClick}
 
                                 position={myMarker.location}
-                                title={myMarker.name}
-                                icon={this.state.MarkerImage}
+                                title={myMarker.title}
+                               // icon={logo}
                                 name={myMarker.name}
-                                animation={this.props.google.maps.Animation.DROP}
+                                //animation={this.props.google.maps.Animation.DROP}
+                                //animation={(this.state.activeMarker === myMarker.name)
+                                //&& this.props.google.maps.Animation.BOUNCE}
+
+                                animation={this.state.activeMarker ? (myMarker.title === this.state.selectedPlace.title ? '1' : '0') : '0'}
                             />
          )}
       <InfoWindow
           marker={this.state.activeMarker}
-          visible={this.state.showingInfoWindow}>
-
+          visible={this.state.showingInfoWindow}
+          icon={this.state.icon}
+          >
+          
             <div>
               <h1>{this.state.selectedPlace.name}              
 
               </h1>
             </div>
-     </InfoWindow>      
+     </InfoWindow>    
+
       </Map>
       </div>
     </div>
