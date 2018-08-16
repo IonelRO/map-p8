@@ -1,26 +1,36 @@
 import React, { Component } from 'react';
 import logo from './media/camera.svg';
+import PropTypes from 'prop-types';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import * as maps from './maps.js';
 import './App.css';
 
 class MapContainer extends Component {
 
 
-constructor(props) {
+ 
+ constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
-
     this.state = {
       showingInfoWindow: false,
       selectedPlace: {},
-      activeMarker: {},
-      icon: {},
-      venues: []
+      activeMarker: {},       
+      venues: [],
+      venuesDetail: {},
+      selectedMarkerId: -1 ,
     };
   }
-  
+  getDetails() {
+        maps.getVenueDetails().then((venuesDetail) => {
+        this.setState({ venuesDetail: venuesDetail })
+        })
+    }
+componentWillMount () {
+    this.getDetails()
+    }  
    componentDidMount() {
         //Get 6 FourSquare (third party) API details
         const url = 'https://api.foursquare.com/v2/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628';
@@ -37,22 +47,21 @@ constructor(props) {
                 const venues = data.response["venues"];
                 this.setState({ venues: venues });
                 this.Map();
-                this.onclickLocation()
+                this.onclickLocation();
+               
             })
             .catch(err => {
                 this.setState({ error: err.toString() })
             })
-    }
-
-
-
-
+          }
+     
+  
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true,
-      icon: logo
+      markericon: logo
     });
   };
 
@@ -60,9 +69,8 @@ constructor(props) {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
-        activeMarker: null
-        
-
+        activeMarker: null,
+        markericon: {}
       })
     }
   };
@@ -76,7 +84,18 @@ constructor(props) {
     });
 	};
  
+  onInfoWindowClose= (props) => {
+    if (this.state.showingInfoWindow) {
+      this.setState({
+        showingInfoWindow: false,
+        activeMarker: null,
+        markericon: {}
+      })
+    }
+  };
 
+  
+ 
   render() {
      // const myMarkers = [
       //  {id:'ChIJzfT-fWqKTUcRnrl89u6v4TE', title: 'Endless column', name:'Endless column', position:{lat: 45.037426, lng: 23.285344}},
@@ -86,6 +105,15 @@ constructor(props) {
       //  {id:'ChIJG2hvBmiKTUcR4Zwsh_8J_oA', title: 'Gorj County Museum', name:'Gorj County Museum', position: {lat: 45.0392, lng: 23.276107}},
       //  {id:'ChIJ_SXJzGmKTUcRpRJO0vXWc2k', title: 'Saints Peter and Paul Church', name:'Saints Peter and Paul Church', position: {lat: 45.038293, lng: 23.27872}}
       // ]
+ //var defaultIcon = {
+  //      url: 'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|0091ff|40|_|%E2%80%A2', // url
+   //     scaledSize: new this.props.google.maps.Size(20, 30), // scaled size
+  //  };
+  //   var highlightedIcon = {
+  //      url:  'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|FFFF24|40|_|%E2%80%A2', // url
+ //       scaledSize: new this.props.google.maps.Size(20, 30), // scaled size
+ //   };
+
 
      return (
       <div className="App">
@@ -126,22 +154,27 @@ constructor(props) {
         </div>
       </div>
        <div id="map">
-
+       console.log(this.state.selectedPlace.id)
        <Map
 
           google={this.props.google}
           onClick={this.onMapClicked}
+          //icon={this.state.activeMarker === null ? '' : logo}
            initialCenter={{
             lat: 45.039638,
             lng: 23.266628
           }}
           zoom={15}
+
+
         >
         {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
                                // onMouseover={this.onMouseoverMarker}
+                               id={myMarker.id}
                                 onClick={this.onMarkerClick}
-
+                                icon = {this.state.markerIcon}
+                                //icon={this.state.activeMarker === null ? '' : logo}
                                 position={myMarker.location}
                                 title={myMarker.title}
                                // icon={logo}
@@ -150,21 +183,26 @@ constructor(props) {
                                 //animation={(this.state.activeMarker === myMarker.name)
                                 //&& this.props.google.maps.Animation.BOUNCE}
 
-                                animation={this.state.activeMarker ? (myMarker.title === this.state.selectedPlace.title ? '1' : '0') : '0'}
-                            />
-         )}
+                               // animation={this.state.activeMarker ? (this.state.venues.id === this.state.selectedPlace.title ? '1' : '0') : '0'}
+                                                       > 
+                            </Marker>
+                            
+
+         )} 
+
       <InfoWindow
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}
-          icon={this.state.icon}
+          onClose={this.onInfoWindowClose} 
           >
           
             <div>
-              <h1>{this.state.selectedPlace.name}              
+             <h1>{this.state.selectedPlace.name}
+             <img src="{this.state.venuesDetail.bestPhoto.prefix}"alt="{this.state.venuesDetail.name}"/>              
 
               </h1>
             </div>
-     </InfoWindow>    
+     </InfoWindow>       
 
       </Map>
       </div>
@@ -180,3 +218,6 @@ export default GoogleApiWrapper({
   apiKey: "AIzaSyB7Ma3Ggl2TFUdsMaW8E4_F62uR65DPHZQ",
   v: "3.30"
 })(MapContainer);
+
+
+    //.catch(error => {console.log(`Error while Getting Venue Details `, error)})
