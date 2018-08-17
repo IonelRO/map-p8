@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import logo from './media/camera.svg';
 import PropTypes from 'prop-types';
+import InfoWindowContent from './InfoWindowsContent'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import * as maps from './maps.js';
 import './App.css';
 
 class MapContainer extends Component {
 
-state={
-  venuesDetail: [],
-  Photos: []
-}
+
  
  constructor(props) {
     super(props);
@@ -22,21 +20,12 @@ state={
       selectedPlace: {},
       activeMarker: {},       
       venues: [],
-      venuesDetail: [],
+    
       selectedMarkerId: -1 ,
-      Photos: []
+      
     };
   }
-  getDetails() {
-        maps.getVenueDetails().then((venuesDetail) => {
-        this.setState({ venuesDetail: venuesDetail });
-        this.setState({ Photos: venuesDetail.bestPhoto })
-        })
-    }
-componentWillMount () {
-    this.getDetails();
-    
-    }  
+  
    componentDidMount() {
         //Get 6 FourSquare (third party) API details
         const url = 'https://api.foursquare.com/v2/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628';
@@ -160,6 +149,7 @@ componentWillMount () {
           <input id="search-within-time" type="button" value="Go"/>
         </div>
       </div>
+
        <div id="map">
        
        <Map
@@ -201,15 +191,14 @@ componentWillMount () {
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}
           onClose={this.onInfoWindowClose} 
+          onClick={this.onMarkerClick}
+
           >
           
             <div>
-             <h1>{this.state.selectedPlace.name}</h1>
+             <h1> <InfoWindowContent/></h1>
                          
-      <div>
-      <img id="img" tabIndex = {0} alt={this.state.Photos.details} className="site-image" src={this.state.Photos.prefix} />
-      <div tabIndex = {0}> {this.state.Photos.suffix}</div>
-      </div>
+     
               
             </div>
      </InfoWindow>       
@@ -218,7 +207,6 @@ componentWillMount () {
       </div>
     </div>
       </div>
-
     );
   }
 }

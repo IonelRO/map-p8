@@ -15,17 +15,19 @@ function handleErrors(response) {
     }
     return response;
 }
-export const getLocationsAll = () =>
-  fetch(`${api}/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628`)
-    .then(handleErrors)
-    .then(res => res.json())
-    .then(data => data.response.venues)
+//export const getLocationsAll = () =>
+//  fetch(`${api}/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628`)
+ //   .then(handleErrors)
+  //  .then(res => res.json())
+ //   .then(data => data.response.venues)
     //.catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
 
+
+
 export const getVenueDetails = (venueId)=> {
-let venueDetailsUrl =[`/venues/4dc6a9e618387d1bd55cbb65?`,
-					  `client_id=ETBUYYTEGDY4WCF1IZXYZJVILWVA5NTLHGQ0WHA13OL2QGA2`,
-					  `&client_secret=MJRDFQ43T0FSXPBBFA535VVJVKLUFATMY5IHP2DOFTOKZSYP&v=20180708`].join("")
+let venueDetailsUrl =[`/venues/${venueId}?`,
+					  `client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC`,
+					  `&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&v=20180708`].join("")
 
 return	fetch(`${api}${venueDetailsUrl}`)
 		.then(res => res.json())

@@ -19,6 +19,8 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+     
+
         <MapContainer 
         //seletedMarkerId={this.state.seletedMarkerId}
          onMarkerClick = {this.onMarkerClick}
