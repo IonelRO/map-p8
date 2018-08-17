@@ -7,7 +7,10 @@ import './App.css';
 
 class MapContainer extends Component {
 
-
+state={
+  venuesDetail: [],
+  Photos: []
+}
  
  constructor(props) {
     super(props);
@@ -19,17 +22,20 @@ class MapContainer extends Component {
       selectedPlace: {},
       activeMarker: {},       
       venues: [],
-      venuesDetail: {},
+      venuesDetail: [],
       selectedMarkerId: -1 ,
+      Photos: []
     };
   }
   getDetails() {
         maps.getVenueDetails().then((venuesDetail) => {
-        this.setState({ venuesDetail: venuesDetail })
+        this.setState({ venuesDetail: venuesDetail });
+        this.setState({ Photos: venuesDetail.bestPhoto })
         })
     }
 componentWillMount () {
-    this.getDetails()
+    this.getDetails();
+    
     }  
    componentDidMount() {
         //Get 6 FourSquare (third party) API details
@@ -62,6 +68,7 @@ componentWillMount () {
       activeMarker: marker,
       showingInfoWindow: true,
       markericon: logo
+
     });
   };
 
@@ -154,7 +161,7 @@ componentWillMount () {
         </div>
       </div>
        <div id="map">
-       console.log(this.state.selectedPlace.id)
+       
        <Map
 
           google={this.props.google}
@@ -197,10 +204,13 @@ componentWillMount () {
           >
           
             <div>
-             <h1>{this.state.selectedPlace.name}
-             <img src="{this.state.venuesDetail.bestPhoto.prefix}"alt="{this.state.venuesDetail.name}"/>              
-
-              </h1>
+             <h1>{this.state.selectedPlace.name}</h1>
+                         
+      <div>
+      <img id="img" tabIndex = {0} alt={this.state.Photos.details} className="site-image" src={this.state.Photos.prefix} />
+      <div tabIndex = {0}> {this.state.Photos.suffix}</div>
+      </div>
+              
             </div>
      </InfoWindow>       
 
