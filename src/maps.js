@@ -26,13 +26,13 @@ function handleErrors(response) {
 
 export const getVenueDetails = (venueId)=> {
 let venueDetailsUrl =[`/venues/${venueId}?`,
-					  `client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC`,
-					  `&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&v=20180708`].join("")
+					  `client_id=ETBUYYTEGDY4WCF1IZXYZJVILWVA5NTLHGQ0WHA13OL2QGA2`,
+					  `&client_secret=MJRDFQ43T0FSXPBBFA535VVJVKLUFATMY5IHP2DOFTOKZSYP&v=20180708`].join("")
 
 return	fetch(`${api}${venueDetailsUrl}`)
 		.then(res => res.json())
 		.then(data => data.response.venue)
-		//.catch(error => {console.log(`Error while Getting Venue Details `, error)})
+		.catch(error => {console.log(`Error while Getting Venue Details `, error)})
 }
 
 /***********************Google Maps API*****************************************************/

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import logo from './media/camera.svg';
 import PropTypes from 'prop-types';
-import InfoWindowContent from './InfoWindowsContent'
+import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import * as maps from './maps.js';
+import InfoWindowContent from './InfoWindowsContent'
 import './App.css';
 
 class MapContainer extends Component {
@@ -18,15 +19,17 @@ class MapContainer extends Component {
     this.state = {
       showingInfoWindow: false,
       selectedPlace: {},
-      activeMarker: {},       
+      activeMarker: {},
+      venuesDetail: {},
+      Photos: {},       
       venues: [],
-    
-      selectedMarkerId: -1 ,
+      venuesID: "4e37bf9e18a8470916cd9103",     
+     
       
     };
   }
   
-   componentDidMount() {
+   componentWillMount() {
         //Get 6 FourSquare (third party) API details
         const url = 'https://api.foursquare.com/v2/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628';
         fetch(url)
@@ -49,24 +52,41 @@ class MapContainer extends Component {
                 this.setState({ error: err.toString() })
             })
           }
-     
-  
+    getDetails() {
+        maps.getVenueDetails(this.state.venuesID)
+        .then((venuesDetail) => {
+        this.setState({ venuesDetail: venuesDetail })
+        this.setState({ Photos: venuesDetail.bestPhoto })
+
+        })
+    }
+  componentDidMount () {
+    this.getDetails();
+    
+    }  
+  venuesDetailUpdate = (venuesID) => {
+    maps.getVenueDetails(venuesID).then(() => {
+            this.getDetails()
+      })
+  }
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true,
-      markericon: logo
+      venuesID: this.state.selectedPlace.id,
+      icon: logo,
+      venuesDetailUpdate: this.venuesDetailUpdate
 
     });
   };
-
+ 
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
         activeMarker: null,
-        markericon: {}
+        icon: defaultIcon
       })
     }
   };
@@ -75,7 +95,7 @@ class MapContainer extends Component {
   		this.setState({
       selectedPlace: props,
       activeMarker: marker,
-      showingInfoWindow: true,
+      icon: defaultIcon
       
     });
 	};
@@ -83,9 +103,9 @@ class MapContainer extends Component {
   onInfoWindowClose= (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
-        showingInfoWindow: false,
-        activeMarker: null,
-        markericon: {}
+       showingInfoWindow: false,
+       activeMarker: null,
+       icon: defaultIcon
       })
     }
   };
@@ -167,15 +187,21 @@ class MapContainer extends Component {
         >
         {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
-                               // onMouseover={this.onMouseoverMarker}
+                              // onMouseover={this.onMouseoverMarker}
                                id={myMarker.id}
                                 onClick={this.onMarkerClick}
-                                icon = {this.state.markerIcon}
-                                //icon={this.state.activeMarker === null ? '' : logo}
+                               // icon = {this.state.Icon}
+                               icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
                                 position={myMarker.location}
                                 title={myMarker.title}
                                // icon={logo}
                                 name={myMarker.name}
+                               // if (this.state.activeMarker.id !== myMarker.id) {
+            //Bounce animation for the marker
+           // infowindow.marker = marker.setAnimation(window.google.maps.Animation.BOUNCE);
+            //setTimeout(function () {
+            //    marker.setAnimation(null);
+           // }, 1000);
                                 //animation={this.props.google.maps.Animation.DROP}
                                 //animation={(this.state.activeMarker === myMarker.name)
                                 //&& this.props.google.maps.Animation.BOUNCE}
@@ -192,15 +218,17 @@ class MapContainer extends Component {
           visible={this.state.showingInfoWindow}
           onClose={this.onInfoWindowClose} 
           onClick={this.onMarkerClick}
-
+          venuesDetailUpdate={this.venuesDetailUpdate}
           >
-          
-            <div>
-             <h1> <InfoWindowContent/></h1>
-                         
-     
+                      
+             <h1> {this.state.selectedPlace.name}</h1>
+            
+   <img id="img" tabIndex = {0} alt={this.state.selectedPlace.name} className="site-image" src={this.state.Photos.prefix+this.state.Photos.width+'x'+this.state.Photos.height+this.state.Photos.suffix} />
+      
+        
+   
               
-            </div>
+           
      </InfoWindow>       
 
       </Map>
