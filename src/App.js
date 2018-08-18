@@ -25,7 +25,7 @@ class App extends Component {
         //seletedMarkerId={this.state.seletedMarkerId}
          onMarkerClick = {this.onMarkerClick}
         />
-        <InfoWindowContent/>
+      <InfoWindowContent/>
       </div>
     );
   }

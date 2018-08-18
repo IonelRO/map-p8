@@ -38,3 +38,11 @@ class InfoWindowContent extends Component {
    )}
 }
 export default InfoWindowContent
+
+export const photocontent = ()=> {
+let img = `${this.state.Photos.prefix}${this.state.Photos.width}x${this.state.Photos.height}${this.state.Photos.suffix}` 
+return	fetch(`${photocontent}`)
+		.then(res => res.json())
+		.then(data => data.response.venue)
+		.catch(error => {console.log(`Error while Getting Venue Details `, error)})
+}

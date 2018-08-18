@@ -15,12 +15,12 @@ function handleErrors(response) {
     }
     return response;
 }
-//export const getLocationsAll = () =>
-//  fetch(`${api}/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628`)
- //   .then(handleErrors)
-  //  .then(res => res.json())
- //   .then(data => data.response.venues)
-    //.catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
+export const getLocationsAll = () =>
+  fetch(`${api}/venues/search?&radius=250&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180812&ll=45.039638,23.266628`)
+    .then(handleErrors)
+   .then(res => res.json())
+    .then(data => data.response.venues)
+   .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
 
 
 
