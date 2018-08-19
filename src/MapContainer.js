@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import * as maps from './maps.js';
-import InfoWindowContent from './InfoWindowsContent'
+import * as InfoWindowContent from './InfoWindowsContent'
 import './App.css';
 
 
@@ -22,54 +22,77 @@ class MapContainer extends Component {
       venuesDetail: {},
       Photos: {},     
       venues: [],      
-      venuesId: {}
-      
+      venuesId: {},
+      Locationid: [],
+      img: {}
     };
   }
 
-getid = () => {
-    let venuestId = this.state.selectedPlace.id === "" ?  "4e37c5286284fcf7399e92ce" : this.state.activeMarker.id
-}
+//getid = () => {
+//    let venuesId = this.state.selectedPlace.id === "" ?  "4e37c5286284fcf7399e92ce" : this.state.activeMarker.id
+//}
 
-   render () {
-         this.venuestId
-    }
+   //return () {
+   //   this.venuesId
+         
+  // }
+
+
+
+
 
   getLocations() {
         maps.getLocationsAll()
         .then(venues => {
-        this.setState({ venues: venues }) 
-        this.setState({ venuesId: venues.id })
-        })
-    }
+
+        this.setState({ venues: venues })
+       // this.setState({ venuesId: venues.id }) 
+      //  this.setState({ venuesId: venues.id })
+  })
+  }
+
+   
   componentWillMount () {
     this.getLocations();
+   //const venuesId = this.props.venuesId;
+   
+    
 }
+  //  getDetails() {
+  //  InfoWindowContent.photocontent()
+  //  .then(img => {
+  //  this.setState({ img: img })  
+ //    })
+//  }
     getDetails() {
-        maps.getVenueDetails("4e37c5286284fcf7399e92ce")
+        maps.getVenueDetails(this.state.venues.id)
         .then((venuesDetail) => {
         this.setState({ venuesDetail: venuesDetail })
         this.setState({ Photos: venuesDetail.bestPhoto })
 
         })
+         .catch(err => {
+        this.setState({ error: true });
+      });
     }
+
   componentDidMount () {
     this.getDetails();
-    
+   
     }  
-  venuesDetailUpdate = (venuesID) => {
-    maps.getVenueDetails(venuesID).then(() => {
-            this.getDetails()
-      })
-  }
+//  venuesDetailUpdate = (venuesId) => {
+ //   maps.getVenueDetails(venuesId).then(() => {
+   //         this.getDetails()
+  //    })
+//  }
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true,
-      venuesID: this.state.selectedPlace.id,
+   //   venuesId: this.state.selectedPlace.id,
       icon: logo,
-      venuesDetailUpdate: this.venuesDetailUpdate
+     // venuesDetailUpdate: this.venuesDetailUpdate
 
     });
   };
@@ -108,6 +131,21 @@ getid = () => {
  
   render() {
      
+  //  const {venuesId} = this.props;
+ function WindowInf(props) {
+       const Locationid = this.props.venues.map(venue => 
+        <div key={venue.id}
+        title={venue.title}>
+       </div>
+      );
+  return (
+    <div>
+     
+      </div>
+      );
+    }
+     
+ 
 
      return (
       <div className="App">
@@ -163,6 +201,7 @@ getid = () => {
 
 
         >
+
         {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
                               // onMouseover={this.onMouseoverMarker}
@@ -199,6 +238,7 @@ getid = () => {
           >
                       
              <h1> {this.state.selectedPlace.name}</h1>
+
            
    <img id="img" tabIndex = {0} alt={this.state.selectedPlace.name} className="site-image" src={this.state.Photos.prefix+this.state.Photos.width+'x'+this.state.Photos.height+this.state.Photos.suffix} />
       
