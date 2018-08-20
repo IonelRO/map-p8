@@ -4,12 +4,19 @@ import PropTypes from 'prop-types';
 import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import * as maps from './maps.js';
-import * as InfoWindowContent from './InfoWindowsContent'
+import ImageViewer from './ImageViewer.js'
 import './App.css';
 
 
 class MapContainer extends Component {
-
+static propTypes = {
+  }
+  state = {
+    imageSrc: {}, 
+    venueDetails: {},
+    detailsString: '',
+    success: false
+  }
   constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
@@ -19,12 +26,13 @@ class MapContainer extends Component {
       showingInfoWindow: false,
       selectedPlace: {},
       activeMarker: {},
-      venuesDetail: {},
+      venuesDetail: [],
       Photos: {},     
       venues: [],      
       venuesId: {},
       Locationid: [],
-      img: {}
+      img: {},
+      flickrImgimages: []
     };
   }
 
@@ -40,6 +48,15 @@ class MapContainer extends Component {
 
 
 
+getImages() {
+        maps.getflickrImg()
+        .then(flickrImgimages => {
+        this.setState({ flickrImgimages: flickrImgimages })
+       // this.setState({ venuesId: venues.id }) 
+          
+  })
+  }
+
 
   getLocations() {
         maps.getLocationsAll()
@@ -47,38 +64,69 @@ class MapContainer extends Component {
 
         this.setState({ venues: venues })
        // this.setState({ venuesId: venues.id }) 
-      //  this.setState({ venuesId: venues.id })
+          
   })
   }
 
    
   componentWillMount () {
-    this.getLocations();
-   //const venuesId = this.props.venuesId;
-   
-    
-}
-  //  getDetails() {
-  //  InfoWindowContent.photocontent()
-  //  .then(img => {
-  //  this.setState({ img: img })  
- //    })
-//  }
-    getDetails() {
-        maps.getVenueDetails(this.state.venues.id)
-        .then((venuesDetail) => {
-        this.setState({ venuesDetail: venuesDetail })
-        this.setState({ Photos: venuesDetail.bestPhoto })
+    this.getLocations()
+    this.getImages()
+    let img
+    let constructString
 
+
+    function handleErrors(response) {
+        if (response === undefined) {
+          console.log('[Venue details ]response status Text',  response)
+          this.setState({
+          success:false
         })
-         .catch(err => {
-        this.setState({ error: true });
-      });
+            throw Error(response.statusText);
+        }
+        return response;
     }
 
+    maps.getVenueDetails(this.props.venueId)
+    .then(handleErrors)
+    .then(data => {
+    
+    if(data !== undefined && data !== null) {
+    const bestPhoto =  data.bestPhoto
+    if(bestPhoto !== undefined && bestPhoto !== null) {
+      img =`${bestPhoto.prefix}${bestPhoto.width}x${bestPhoto.height}${bestPhoto.suffix}`
+    } else {
+      img = process.env.PUBLIC_URL+'/no-photo-available.jpg'
+    }
+    
+    let isOpen = ((data.hours !== undefined && data.hours.isopen))? 'Working Hours: '+ data.hours.isopen : 'Un available working hours'
+    let address = ((data.Location !== undefined && data.location.address )? 'Location : '+ data.location.address : '')
+    let phone = ((data.contact !== undefined && data.contact.phone) ? 'Phone: '+ data.contact.phone : '' )
+    let likes =  ((data.likes !== undefined && data.likes.count) ? 'Likes :' + data.likes.count : '')
+    let rating =  (data.rating !== undefined ? 'Rating :'+data.rating : '' )
+    constructString =`${phone}   ${address} 
+              ${likes}  
+              ${rating} ${isOpen} Time Zone: ${data.timeZone}`
+
+    }
+    this.setState({
+      success: true,
+      venueDetails : data,
+      imageSrc: img,
+      detailsString: constructString
+    })    
+    }).catch(error => {
+      console.log(`Error while Getting Venue Details FourSquareService May Be un reachable or unavailable `, error)
+      alert('Error while Getting Venue Details FourSquareAPiService may be un reachable or unavailable') 
+      this.setState({
+        success:false
+      })
+    })
+  }
+
   componentDidMount () {
-    this.getDetails();
-   
+  
+  //  this.setState({ Content: this.state.venuesDetail.bestPhoto })
     }  
 //  venuesDetailUpdate = (venuesId) => {
  //   maps.getVenueDetails(venuesId).then(() => {
@@ -130,7 +178,7 @@ class MapContainer extends Component {
   
  
   render() {
-     
+     const {title, latlng, venueId} = this.props
   //  const {venuesId} = this.props;
  function WindowInf(props) {
        const Locationid = this.props.venues.map(venue => 
@@ -144,7 +192,7 @@ class MapContainer extends Component {
       </div>
       );
     }
-     
+
  
 
      return (
@@ -206,11 +254,11 @@ class MapContainer extends Component {
         <Marker key={myMarker.id}
                               // onMouseover={this.onMouseoverMarker}
                                id={myMarker.id}
-                                onClick={this.onMarkerClick}
+                               onClick={this.onMarkerClick}
                                icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
-                                position={myMarker.location}
-                                title={myMarker.title}
-                                name={myMarker.name}
+                               position={myMarker.location}
+                               title={myMarker.title}
+                               name={myMarker.name}
                                // animation={this.state.selectedPlace.id === myMarker.id ? '1' : '0'}
                                
             //Bounce animation for the marker
@@ -232,15 +280,37 @@ class MapContainer extends Component {
       <InfoWindow
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}
+          content={this.state.selectedPlace.name}
           onClose={this.onInfoWindowClose} 
           onClick={this.onMarkerClick}
+          updateContent={this.state.selectedPlace.name}
           venuesDetailUpdate={this.venuesDetailUpdate}
+          content={this.state.selectedPlace.name}
           >
-                      
-             <h1> {this.state.selectedPlace.name}</h1>
+               {this.state.venues.map(info =>        
+            <div key={info.id}> <h1> 
+             {this.state.selectedPlace.id === info.id ? info.name : ''} </h1>
+            <p>{this.state.selectedPlace.id === info.id ?info.location.address : ''} </p>
+            <p>{this.state.selectedPlace.id === info.id ?info.location.crossStreet : ''} </p>
+            <div className="picture-Style" tabIndex = {0} aria-label="Info window">
+        <div className="window-title" tabIndex = {0}> {title }  </div>  
+        { 
+        (this.state.success) && (this.state.imageSrc !== undefined && this.state.imageSrc !== null) && (
+          <ul id="images-list" tabIndex = {0}>          
+              <ImageViewer  imageSrc = {this.state.imageSrc} 
+               detailsData = {this.state.detailsString} >
+              </ImageViewer>
+            
+          </ul>)
+        }
+        {(!this.state.success) && 
+        ( <div className="load-failed">Failed to Load data from foursquare API to get Venue details</div>)}       
+      </div>
 
+
+             </div>  )}
            
-   <img id="img" tabIndex = {0} alt={this.state.selectedPlace.name} className="site-image" src={this.state.Photos.prefix+this.state.Photos.width+'x'+this.state.Photos.height+this.state.Photos.suffix} />
+  
       
         
    

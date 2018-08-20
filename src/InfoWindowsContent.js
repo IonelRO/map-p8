@@ -6,14 +6,29 @@ class InfoWindowContent extends Component {
 	
 	state={
   	venuesDetail: {},
-  	Photos: {}
+  	Photos: {},
+    venues: []
 	}
 
-	getDetails() {
+	 getLocations() {
+        maps.getLocationsAll()
+        .then(venues => {
+
+        this.setState({ venues: venues })
+       // this.setState({ venuesId: venues.id }) 
+          
+  })
+  }
+componentWillMount () {
+    this.getLocations();
+   //const venuesId = this.props.venuesId;
+      
+}
+  getDetails() {
         maps.getVenueDetails("4e37c5286284fcf7399e92ce")
-        .then((venuesDetail) => {
-        this.setState({ venuesDetail: venuesDetail });
-       	this.setState({ Photos: venuesDetail.bestPhoto });
+        .then(venuesDetail => {
+        this.setState({ venuesDetail: venuesDetail })
+     
 
         })
     }
@@ -28,14 +43,12 @@ class InfoWindowContent extends Component {
  //     })
 //  }
      render() {
-    	const {venueId} = this.props
-
-     return (
+    return (
       <div>
-      <img id="img" tabIndex = {0} alt={this.state.venuesDetail.id} className="site-image" src={this.state.Photos.prefix+'230x230'+this.state.Photos.suffix} />
-      <div tabIndex = {0}> {this.state.Photos.suffix}</div>
+        <h1></h1>        
       </div>
-   )}
+    );
+  }
 }
 export default InfoWindowContent
 
