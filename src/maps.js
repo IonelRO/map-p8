@@ -22,10 +22,10 @@ export const getLocationsAll = () =>
    .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
 
 export const getflickrImg = () =>
-  fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=dde53ac50f605c18857b4713e8eb0f79&lat=45.0411633&lon=23.2662036&format=rest&auth_token=72157672517758038-7fb3dcadea2ad616&api_sig=3b682bfe4670b3b344744aaecec7e13e')
-    .then(handleErrors)
-   .then(res => res.text())
-    .then(data => data.response.flickrImgimages)
+  fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=cc486d5a638ecbda69e566971f130c71&tags=&lat=45.0411633&lon=23.2662036&format=json&nojsoncallback=1&auth_token=72157698813831471-52ba3a104b4bb378&api_sig=99f32933549a1428785e990e613691be')
+   .then(handleErrors)
+   .then(res => res.json())
+   .then(data => data.response.photo)
    .catch(error => {console.log('Error While getting All Locations data from flickr API', error)})
 
 export const getVenueDetails = (venueId)=> {

@@ -15,8 +15,11 @@ static propTypes = {
     imageSrc: {}, 
     venueDetails: {},
     detailsString: '',
-    success: false
+    success: false,
+    infoLoaded: false,
+    flickrImgimages: [],
   }
+  
   constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
@@ -32,7 +35,8 @@ static propTypes = {
       venuesId: {},
       Locationid: [],
       img: {},
-      flickrImgimages: []
+      flickrImgimages: [],
+      infoLoaded: true
     };
   }
 
@@ -44,9 +48,6 @@ static propTypes = {
    //   this.venuesId
          
   // }
-
-
-
 
 getImages() {
         maps.getflickrImg()
@@ -124,15 +125,35 @@ getImages() {
     })
   }
 
-  componentDidMount () {
-  
+    componentDidMount () {
+    fetch(
+         "https://api.flickr.com/services/rest/?"+
+         "method=flickr.photos.search&api_key=cc486d5a638ecbda69e566971f130c71"+
+         "&tags="+       
+         "&lat=45.0411633&lon=23.2662036&radius=1&radius_units=&format=json&nojsoncallback=1&auth_token=72157698813831471-52ba3a104b4bb378&api_sig=0a5df792edb0c83e20a82c99b45502d5"
+           )
+ 
+
+        .then(function(response) {
+          return response.json();
+        })
+        .then(
+          function(j) {
+            let picArray = j.photos.photo.map(pic => {
+              var srcPath =
+                "https://farm" + pic.farm + ".staticflickr.com/" + pic.server + "/" + pic.id + "_" + pic.secret + ".jpg";
+              return  <img key={pic.id} alt={pic.title} src={srcPath} />;
+            });
+            this.setState({ pictures: picArray });
+            }.bind(this)
+        );
   //  this.setState({ Content: this.state.venuesDetail.bestPhoto })
-    }  
+     
 //  venuesDetailUpdate = (venuesId) => {
  //   maps.getVenueDetails(venuesId).then(() => {
    //         this.getDetails()
   //    })
-//  }
+  }
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
@@ -176,7 +197,6 @@ getImages() {
   };
 
   
- 
   render() {
      const {title, latlng, venueId} = this.props
   //  const {venuesId} = this.props;
@@ -196,7 +216,7 @@ getImages() {
  
 
      return (
-      <div className="App">
+      <div>
 
     <div className="container">
       <div className="options-box">
@@ -233,6 +253,8 @@ getImages() {
           <input id="search-within-time" type="button" value="Go"/>
         </div>
       </div>
+      
+
 
        <div id="map">
        
@@ -283,6 +305,7 @@ getImages() {
           content={this.state.selectedPlace.name}
           onClose={this.onInfoWindowClose} 
           onClick={this.onMarkerClick}
+          
           updateContent={this.state.selectedPlace.name}
           venuesDetailUpdate={this.venuesDetailUpdate}
           content={this.state.selectedPlace.name}
@@ -292,6 +315,8 @@ getImages() {
              {this.state.selectedPlace.id === info.id ? info.name : ''} </h1>
             <p>{this.state.selectedPlace.id === info.id ?info.location.address : ''} </p>
             <p>{this.state.selectedPlace.id === info.id ?info.location.crossStreet : ''} </p>
+            
+
             <div className="picture-Style" tabIndex = {0} aria-label="Info window">
         <div className="window-title" tabIndex = {0}> {title }  </div>  
         { 

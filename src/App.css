@@ -107,7 +107,60 @@ html,
         width: 27%;
         height: 27%;
       }
+.filter {
+  background-color: #eee;
+  width: 30%;
+  padding: 1em;
+}
 
+.filter-title {
+  color: #000;
+  font-size: 24px;
+  font-weight: 300;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #ccc;
+}
+
+.input-wrapper {
+  position: relative;
+  height: 35px;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.input-wrapper input {
+  height: 100%;
+  width: 90%;
+  background-color: #fff;
+  line-height: 30px;
+  padding: 0.5em;
+  font-size: 15px;
+}
+
+.filtered-places {
+  margin: 0.5em 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.filtered-list {
+  list-style: none;
+  padding: 0.5em;
+  background-color: #ddd;
+}
+
+.filtered-list .result-item {
+  font-size: 15px;
+  padding: 0.5em;
+  border-bottom: 1px solid #b0bec5;
+  cursor: pointer;
+}
+
+.filtered-list .result-item:hover,
+.filtered-list .result-item:focus {
+  color: #000;
+  padding-left: 10px;
+}
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
