@@ -132,11 +132,8 @@ getImages() {
          "&tags="+       
          "&lat=45.0411633&lon=23.2662036&radius=1&radius_units=&format=json&nojsoncallback=1&auth_token=72157698813831471-52ba3a104b4bb378&api_sig=0a5df792edb0c83e20a82c99b45502d5"
            )
- 
-
-        .then(function(response) {
-          return response.json();
-        })
+          .then(res => res.json())
+   
         .then(
           function(j) {
             let picArray = j.photos.photo.map(pic => {
