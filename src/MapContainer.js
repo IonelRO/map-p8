@@ -29,12 +29,12 @@ static propTypes = {
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
     this.state = {
       showingInfoWindow: false,
-      selectedPlace: {},
+      selectedPlace: "",
       activeMarker: {},
-      venuesDetail: [],
+      venuesDetail: {},
       Photos: {},     
       venues: [],      
-      venuesId: {},
+      venueId: "",
       Locationid: [],
       img: {},
       flickrImgimages: [],
@@ -90,43 +90,31 @@ getImages() {
             throw Error(response.statusText);
         }
         return response;
-    }
-
-    maps.getVenueDetails("4db56c2bfa8c350240f8fe5a")
-    .then(handleErrors)
-    .then(data => {
-    
-    if(data !== undefined && data !== null) {
-    const bestPhoto =  data.bestPhoto
-    if(bestPhoto !== undefined && bestPhoto !== null) {
-      img =`${bestPhoto.prefix}${bestPhoto.width}x${bestPhoto.height}${bestPhoto.suffix}`
-    } else {
-      img = process.env.PUBLIC_URL+'/no-photo-available.jpg'
-    }
-    
-    let address = ((data.Location !== undefined && data.location.address )? 'Location : '+ data.location.address : '')
-    let phone = ((data.contact !== undefined && data.contact.phone) ? 'Phone: '+ data.contact.phone : '' )
-    let likes =  ((data.likes !== undefined && data.likes.count) ? 'Likes :' + data.likes.count : '')
-    let rating =  (data.rating !== undefined ? 'Rating :'+data.rating : '' )
-    constructString =`${phone}   ${address} 
-              ${likes}  
-              ${rating}`
-
-    }
-    this.setState({
-      success: true,
-      venueDetails : data,
-      imageSrc: img,
-      detailsString: constructString
-    })    
-    }).catch(error => {
-      console.log(`Error while Getting Venue Details FourSquareService May Be un reachable or unavailable `, error)
-      alert('Error while Getting Venue Details FourSquareAPiService may be un reachable or unavailable') 
-      this.setState({
-        success:false
-      })
-    })
+    }       
   }
+  updateDetails = (venueId) => {
+    this.setState({ venueId: venueId })
+    this.updatefindDetails(venueId)
+  }
+  updatefindDetails = (venueId) => {
+        //query interogation, look for books that match
+        if (venueId) {
+            //using mapsf display matching places
+            maps.getVenueDetails(venueId).then((venueDetails) => {
+                //check if search query doesn't exist or generate error, then no results, empty array               
+                //Reference: https://dev.to/sarah_chima/error-boundaries-in-react-3eib
+                if (venueDetails.error) {
+                    this.setState({ venueDetails: [] })
+                } else {
+                //in books math with query then it are displayed
+                    this.setState({ venueDetails: venueDetails })
+                }
+            })
+            //no query shows us no results, empty array
+        } else {
+            this.setState({ venueDetails: [] })
+        }
+   }
 
   //  componentDidMount () {
   //  fetch(
@@ -162,6 +150,8 @@ getImages() {
       showingInfoWindow: true,
    //   venuesId: this.state.selectedPlace.id,
       icon: logo,
+
+
      // venuesDetailUpdate: this.venuesDetailUpdate
 
     });
@@ -198,14 +188,14 @@ getImages() {
   };
 updateQuery = (query) => {
     this.setState({ query: query })
-    this.updatefindLocations(query)
+    this.updatesfindLocations(query)
   }
 
-updatefindLocations = (query) => {
+updatesfindLocations = (query) => {
         //query interogation, look for books that match
         if (query) {
-            //using BooksAPI display matching books
-            maps.getLocationsAll(query).then((findPlaces) => {
+            //using maps display matching places
+            maps.getSelectedAll(query).then((findPlaces) => {
                 //check if search query doesn't exist or generate error, then no results, empty array               
                 //Reference: https://dev.to/sarah_chima/error-boundaries-in-react-3eib
                 if (findPlaces.error) {
@@ -222,7 +212,7 @@ updatefindLocations = (query) => {
     }
   
   render() {
-     const {title, venueId} = this.props
+     const {title} = this.props
       
       this.state.findPlaces.map((findPlaces) => {
             
@@ -236,43 +226,59 @@ updatefindLocations = (query) => {
     <div className="container">
       <div className="options-box">
         <h1>Târgu Jiu - Brîncuși - Home town</h1>
-        <div>
-          <input id="show-listings" type="button" value="Show Listings"/>
-          <input id="hide-listings" type="button" value="Hide Listings"/>
-          <hr/>
-          <span className="text"> Draw a shape to search within it for homes!</span>
-          <input id="toggle-drawing"  type="button" value="Drawing Tools"/>
-        </div>
-        <hr/>
-        <div>
+        
+         <div className="input-wrapper">
 
-          <input id="zoom-to-area-text" type="text" placeholder="Enter your favorite area!"/>
-          <input id="zoom-to-area" type="button" value="Zoom"/>
           <input type="text" 
-          placeholder="Search by title or author"
+          placeholder="Find places on map"
+          aria-label="Find places on map"
           value={this.state.query}
           onChange={(event) => this.updateQuery(event.target.value)}
           />
         </div>
-        <hr/>
-        <div>
-          <span className="text"> Within </span>
-          <select id="max-duration">
-            <option value="10">10 min</option>
-            <option value="15">15 min</option>
-            <option value="30">30 min</option>
-            <option value="60">1 hour</option>
-          </select>
-          <select id="mode">
-            <option value="DRIVING">drive</option>
-            <option value="WALKING">walk</option>
-            <option value="BICYCLING">bike</option>
-            <option value="TRANSIT">transit ride</option>
-          </select>
-          <span className="text">of</span>
-          <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY"/>
-          <input id="search-within-time" type="button" value="Go"/>
-        </div>
+        
+        {this.state.findPlaces.map(infos =>            
+            
+            <div key={infos.id} className="filtered-places"> 
+
+            <h1 >          
+             {infos.name} </h1>
+            <p>{this.state.selectedPlace.id === infos.id ?infos.location.address : ''} </p>
+            <p>{this.state.selectedPlace.id === infos.id ?infos.location.crossStreet : ''} </p>
+         
+
+             </div>  )}
+        
+      <h2 className="filter-title" tabIndex="0">
+        Filter Results
+      </h2>
+
+      <div className="input-wrapper">
+          <input
+            type="text"
+            placeholder="Find places on map"
+            aria-label="Find places on map"
+            onChange={e => this.updateQuery(e.target.value)}
+          />
+      </div>
+      <div className="filtered-places">
+        <ul className="filtered-list" tabIndex="0">
+          {
+            this.state.findPlaces.map(place =>
+              <li
+                key={place.id}
+                className="result-item"
+                tabIndex="0"
+                id={place.id}                 
+              >
+                {place.name}
+                <p>{this.state.selectedPlace.id === place.id ?place.location.address : ''}</p>
+              </li>
+            )
+          }
+        </ul>
+      </div>
+    
       </div>
       
 
@@ -293,9 +299,8 @@ updatefindLocations = (query) => {
 
         >
         
-       {this.state.venues.map(myMarker =>
+       {this.state.findPlaces.map(myMarker =>
         <Marker key={myMarker.id}
-                              
                                id={myMarker.id}
                                onClick={this.onMarkerClick}
                                icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
@@ -312,10 +317,11 @@ updatefindLocations = (query) => {
       <InfoWindow 
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}         
-          onClose={this.onInfoWindowClose}            
+          onClose={this.onInfoWindowClose}
+
            >
                
-            {this.state.venues.map(info =>            
+            {this.state.findPlaces.map(info =>            
             <div key={info.id}> <h1> 
             
              {this.state.selectedPlace.id === info.id ? info.name : ''} </h1>
