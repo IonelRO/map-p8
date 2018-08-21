@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import MapContainer from './MapContainer';
+
 import './App.css';
 import * as maps from './maps.js';
 import InfoWindowContent from './InfoWindowsContent.js';
@@ -18,15 +19,10 @@ class App extends Component {
     }  
   render() {
     return (
-      <div className="App">
+      
+        
+        <MapContainer />    
      
-
-        <MapContainer 
-        //seletedMarkerId={this.state.seletedMarkerId}
-         onMarkerClick = {this.onMarkerClick}
-        />
-      <InfoWindowContent/>
-      </div>
     );
   }
 }

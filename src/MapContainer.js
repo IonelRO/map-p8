@@ -5,6 +5,7 @@ import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import * as maps from './maps.js';
 import ImageViewer from './ImageViewer.js'
+import FindPage from './Filter.js'
 import './App.css';
 
 
@@ -18,6 +19,7 @@ static propTypes = {
     success: false,
     infoLoaded: false,
     flickrImgimages: [],
+
   }
   
   constructor(props) {
@@ -36,7 +38,9 @@ static propTypes = {
       Locationid: [],
       img: {},
       flickrImgimages: [],
-      infoLoaded: true
+      infoLoaded: true,
+      query: "",
+      findPlaces: []
     };
   }
 
@@ -88,7 +92,7 @@ getImages() {
         return response;
     }
 
-    maps.getVenueDetails(this.props.venueId)
+    maps.getVenueDetails("4db56c2bfa8c350240f8fe5a")
     .then(handleErrors)
     .then(data => {
     
@@ -100,14 +104,13 @@ getImages() {
       img = process.env.PUBLIC_URL+'/no-photo-available.jpg'
     }
     
-    let isOpen = ((data.hours !== undefined && data.hours.isopen))? 'Working Hours: '+ data.hours.isopen : 'Un available working hours'
     let address = ((data.Location !== undefined && data.location.address )? 'Location : '+ data.location.address : '')
     let phone = ((data.contact !== undefined && data.contact.phone) ? 'Phone: '+ data.contact.phone : '' )
     let likes =  ((data.likes !== undefined && data.likes.count) ? 'Likes :' + data.likes.count : '')
     let rating =  (data.rating !== undefined ? 'Rating :'+data.rating : '' )
     constructString =`${phone}   ${address} 
               ${likes}  
-              ${rating} ${isOpen} Time Zone: ${data.timeZone}`
+              ${rating}`
 
     }
     this.setState({
@@ -125,32 +128,33 @@ getImages() {
     })
   }
 
-    componentDidMount () {
-    fetch(
-         "https://api.flickr.com/services/rest/?"+
-         "method=flickr.photos.search&api_key=cc486d5a638ecbda69e566971f130c71"+
-         "&tags="+       
-         "&lat=45.0411633&lon=23.2662036&radius=1&radius_units=&format=json&nojsoncallback=1&auth_token=72157698813831471-52ba3a104b4bb378&api_sig=0a5df792edb0c83e20a82c99b45502d5"
-           )
-          .then(res => res.json())
+  //  componentDidMount () {
+  //  fetch(
+   //      "https://api.flickr.com/services/rest/?"+
+   //      "method=flickr.photos.search&api_key=57f57e014d43c73972e4880901e92e34"+
+   //      "&tags="+       
+    //     "&lat=45.0411633&lon=23.2662036&radius=1&format=json&nojsoncallback=1&auth_token=72157700452507615-df26ea9789e97b9e&api_sig=2d28fadcf01d41f10278bcc323808742"
+    //       )
+   //       .then(res => res.json())
    
-        .then(
-          function(j) {
-            let picArray = j.photos.photo.map(pic => {
-              var srcPath =
-                "https://farm" + pic.farm + ".staticflickr.com/" + pic.server + "/" + pic.id + "_" + pic.secret + ".jpg";
-              return  <img key={pic.id} alt={pic.title} src={srcPath} />;
-            });
-            this.setState({ pictures: picArray });
-            }.bind(this)
-        );
+
+  //      .then(
+   //       function(j) {
+   //         let picArray = j.photos.photo.map(pic => {
+   //           var srcPath =
+  //              "https://farm" + pic.farm + ".staticflickr.com/" + pic.server + "/" + pic.id + "_" + pic.secret + ".jpg";
+   //           return  <img key={pic.id} alt={pic.title} src={srcPath} />;
+   //         });
+   //         this.setState({ pictures: picArray });
+   //         }.bind(this)
+   //     );
   //  this.setState({ Content: this.state.venuesDetail.bestPhoto })
      
 //  venuesDetailUpdate = (venuesId) => {
  //   maps.getVenueDetails(venuesId).then(() => {
    //         this.getDetails()
   //    })
-  }
+ // }
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
@@ -192,26 +196,40 @@ getImages() {
       })
     }
   };
+updateQuery = (query) => {
+    this.setState({ query: query })
+    this.updatefindLocations(query)
+  }
 
+updatefindLocations = (query) => {
+        //query interogation, look for books that match
+        if (query) {
+            //using BooksAPI display matching books
+            maps.getLocationsAll(query).then((findPlaces) => {
+                //check if search query doesn't exist or generate error, then no results, empty array               
+                //Reference: https://dev.to/sarah_chima/error-boundaries-in-react-3eib
+                if (findPlaces.error) {
+                    this.setState({ findPlaces: [] })
+                } else {
+                //in books math with query then it are displayed
+                    this.setState({ findPlaces: findPlaces })
+                }
+            })
+            //no query shows us no results, empty array
+        } else {
+            this.setState({ findPlaces: [] })
+        }
+    }
   
   render() {
-     const {title, latlng, venueId} = this.props
-  //  const {venuesId} = this.props;
- function WindowInf(props) {
-       const Locationid = this.props.venues.map(venue => 
-        <div key={venue.id}
-        title={venue.title}>
-       </div>
-      );
-  return (
-    <div>
-     
-      </div>
-      );
-    }
-
+     const {title, venueId} = this.props
+      
+      this.state.findPlaces.map((findPlaces) => {
+            
+            this.state.findPlaces.map((venue) => {
+                findPlaces.id === venue.id ? findPlaces.name=venue.name : ""}
+            )})
  
-
      return (
       <div>
 
@@ -227,8 +245,14 @@ getImages() {
         </div>
         <hr/>
         <div>
+
           <input id="zoom-to-area-text" type="text" placeholder="Enter your favorite area!"/>
           <input id="zoom-to-area" type="button" value="Zoom"/>
+          <input type="text" 
+          placeholder="Search by title or author"
+          value={this.state.query}
+          onChange={(event) => this.updateQuery(event.target.value)}
+          />
         </div>
         <hr/>
         <div>
@@ -268,79 +292,43 @@ getImages() {
 
 
         >
-
-        {this.state.venues.map(myMarker =>
+        
+       {this.state.venues.map(myMarker =>
         <Marker key={myMarker.id}
-                              // onMouseover={this.onMouseoverMarker}
+                              
                                id={myMarker.id}
                                onClick={this.onMarkerClick}
                                icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
-                               position={myMarker.location}
+                              position={myMarker.location}
                                title={myMarker.title}
-                               name={myMarker.name}
-                               // animation={this.state.selectedPlace.id === myMarker.id ? '1' : '0'}
-                               
-            //Bounce animation for the marker
-           // infowindow.marker = marker.setAnimation(window.google.maps.Animation.BOUNCE);
-            //setTimeout(function () {
-            //    marker.setAnimation(null);
-           // }, 1000);
-                                //animation={this.props.google.maps.Animation.DROP}
-                                //animation={(this.state.activeMarker === myMarker.name)
-                                //&& this.props.google.maps.Animation.BOUNCE}
-
+                              name={myMarker.name} 
                                animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
-                                                       > 
-                            </Marker>
+                              > 
+                          </Marker>
                             
-
+        
          )} 
-
-      <InfoWindow
+      
+      <InfoWindow 
           marker={this.state.activeMarker}
-          visible={this.state.showingInfoWindow}
-          content={this.state.selectedPlace.name}
-          onClose={this.onInfoWindowClose} 
-          onClick={this.onMarkerClick}
-          
-          updateContent={this.state.selectedPlace.name}
-          venuesDetailUpdate={this.venuesDetailUpdate}
-          content={this.state.selectedPlace.name}
-          >
-               {this.state.venues.map(info =>        
+          visible={this.state.showingInfoWindow}         
+          onClose={this.onInfoWindowClose}            
+           >
+               
+            {this.state.venues.map(info =>            
             <div key={info.id}> <h1> 
+            
              {this.state.selectedPlace.id === info.id ? info.name : ''} </h1>
             <p>{this.state.selectedPlace.id === info.id ?info.location.address : ''} </p>
             <p>{this.state.selectedPlace.id === info.id ?info.location.crossStreet : ''} </p>
-            
-
-            <div className="picture-Style" tabIndex = {0} aria-label="Info window">
-        <div className="window-title" tabIndex = {0}> {title }  </div>  
-        { 
-        (this.state.success) && (this.state.imageSrc !== undefined && this.state.imageSrc !== null) && (
-          <ul id="images-list" tabIndex = {0}>          
-              <ImageViewer  imageSrc = {this.state.imageSrc} 
-               detailsData = {this.state.detailsString} >
-              </ImageViewer>
-            
-          </ul>)
-        }
-        {(!this.state.success) && 
-        ( <div className="load-failed">Failed to Load data from foursquare API to get Venue details</div>)}       
-      </div>
-
+         
 
              </div>  )}
-           
-  
-      
-        
-   
-              
-           
+          
      </InfoWindow>       
 
       </Map>
+      document.getElementById('root')
       </div>
     </div>
       </div>

@@ -21,11 +21,18 @@ export const getLocationsAll = () =>
     .then(data => data.response.venues)
    .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
 
+export const getSelectedAll = (query) =>
+  fetch(`${api}/venues/search?&radius=10000&query=${query}&limit10&client_id=HEZXEFLMPE4HONPDQEGOSWEUYNSAIKUZKXRBNPZSK55QK4PC&client_secret=E0TQXTI1GT4BRRABITQIQZSPYSFSBJ0UHRQZH5U00X30DP5B&limit=6&v=20180820&ll=45.0411633,23.2662036`)
+    .then(handleErrors)
+   .then(res => res.json())
+    .then(data => data.response.venues)
+   .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
+
 export const getflickrImg = () =>
   fetch('https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=cc486d5a638ecbda69e566971f130c71&tags=&lat=45.0411633&lon=23.2662036&format=json&nojsoncallback=1&auth_token=72157698813831471-52ba3a104b4bb378&api_sig=99f32933549a1428785e990e613691be')
    .then(handleErrors)
    .then(res => res.json())
-   .then(data => data.response.photo)
+   .then(data => data.response.photos.photo)
    .catch(error => {console.log('Error While getting All Locations data from flickr API', error)})
 
 export const getVenueDetails = (venueId)=> {
