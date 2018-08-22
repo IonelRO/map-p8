@@ -30,6 +30,7 @@ html,
       }
 
       .container {
+        min-height: 50rem;
         height: 100%;
         position: relative;
       }
@@ -40,7 +41,7 @@ html,
 
       h1 {
         color: #525454;
-        font-size: 22px;
+        font-size: 25px;
         margin: 0 0 10px 0;
         text-align: center;
       }
@@ -66,14 +67,15 @@ html,
       }
 
       .options-box {
+        min-height: 40rem;
         background: #fff;
-        border: 1px solid #999;
+        
         border-radius: 3px;
         height: 100%;
         line-height: 35px;
         padding: 10px 10px 30px 10px;
         text-align: left;
-        width: 340px;
+        max-width: 340px;
       }
 
       #pano {
@@ -124,13 +126,13 @@ html,
 .input-wrapper {
   position: relative;
   height: 35px;
-  width: 100%;
-  margin: 1em 0;
-}
+ 
+  margin: 0,5em 0 0,5em 0;
+} 
 
 .input-wrapper input {
   height: 100%;
-  width: 90%;
+  width: 94%;
   background-color: #fff;
   line-height: 30px;
   padding: 0.5em;
@@ -150,7 +152,7 @@ html,
 }
 
 .filtered-list .result-item {
-  font-size: 15px;
+  font-size: 25px;
   padding: 0.5em;
   border-bottom: 1px solid #b0bec5;
   cursor: pointer;
@@ -161,6 +163,16 @@ html,
   color: #000;
   padding-left: 10px;
 }
+
+footer,
+header {
+  padding: 12px 0 5px 0;
+  text-align: center;
+  background-color: #ddd;
+  font-size: 25px;
+}
+
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
