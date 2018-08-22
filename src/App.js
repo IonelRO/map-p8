@@ -18,6 +18,7 @@ static propTypes = {
     success: false,
     infoLoaded: false,
     flickrImgimages: [],
+    selectedPlace: "",
 
   }
   
@@ -92,7 +93,8 @@ updateQuery = (query) => {
      this.setState({
         showingInfoWindow: false,
         activeMarker: null,
-        icon: defaultIcon,        
+        icon: defaultIcon,
+
       })
     this.updatesfindLocations(query)   
   }
@@ -110,7 +112,7 @@ updatesfindLocations = (query) => {
                 //in books math with query then it are displayed
                     this.setState({ findPlaces: findPlaces })
                     this.setState({ venues: findPlaces })
-
+                    
                 }
             })
             //no query shows us no results, empty array
@@ -144,22 +146,25 @@ updatesfindLocations = (query) => {
       <div className="filtered-places">
         <ul className="filtered-list" tabIndex="0">
           {
-            this.state.venues.map(place =>
+        
+        this.state.venues.map(place =>
               <li
+               
                 key={place.id}
                 className="result-item"
                 tabIndex="0"
                 id={place.id} 
-                onClick={this.onMarkerClick}
-                onClose={this.onInfoWindowClose}
+                onClick={e => this.onMarkerClick(place, null, e)}               
                           
               >
                 {place.name}
           
               </li>
+
             )
           }
         </ul>
+        
       </div>
     
       </div>
@@ -181,7 +186,7 @@ updatesfindLocations = (query) => {
           onClick={this.onMarkerClick}
           icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
           position={myMarker.location}
-           title={myMarker.title}
+          title={myMarker.title}
           name={myMarker.name} 
           animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
         > 
