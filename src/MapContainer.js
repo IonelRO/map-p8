@@ -269,7 +269,8 @@ updatesfindLocations = (query) => {
                 key={place.id}
                 className="result-item"
                 tabIndex="0"
-                id={place.id}                 
+                id={place.id}
+                 onClick={this.onMarkerClick}
               >
                 {place.name}
                 <p>{this.state.selectedPlace.id === place.id ?place.location.address : ''}</p>
