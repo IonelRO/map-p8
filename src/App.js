@@ -150,12 +150,12 @@ updatesfindLocations = (query) => {
                 className="result-item"
                 tabIndex="0"
                 id={place.id} 
-                onClick={e => this.onMapClicked()}
+                onClick={this.onMarkerClick}
                 onClose={this.onInfoWindowClose}
-                            
+                          
               >
                 {place.name}
-                <p>{this.state.selectedPlace.id === place.id ?place.location.address : ''}</p>
+          
               </li>
             )
           }
@@ -195,7 +195,7 @@ updatesfindLocations = (query) => {
         >
            <div key={this.state.selectedPlace.id}>                    
            <h1> {this.state.selectedPlace.name} </h1>
-        {this.state.venues.map(info =>            
+          {this.state.venues.map(info =>            
            <div key={info.id}> 
            <p>{this.state.selectedPlace.id === info.id ?info.location.address : ''} </p>
            <p>{this.state.selectedPlace.id === info.id ?info.location.crossStreet : ''} </p>
