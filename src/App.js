@@ -27,6 +27,9 @@ static propTypes = {
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
+    let marker = React.createRef();
+      
+    
     this.state = {
       showingInfoWindow: false,
       selectedPlace: "",
@@ -34,9 +37,8 @@ static propTypes = {
       venues: [],      
       infoLoaded: true,
       query: "",
-      findPlaces: [],
-      markerfl: null,
-      hasError: false
+      findPlaces: [],    
+      hasError: false,
     };
   }
 
@@ -61,19 +63,18 @@ componentDidMount () {
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
-
-      activeMarker: this.refs.marker,
-     
+      activeMarker: marker,
       showingInfoWindow: true,
       icon: logo,
      });
+   
   };
  
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
-        activeMarker: null,
+       
         selectedPlace: props,
         icon: defaultIcon,
         
@@ -94,7 +95,7 @@ componentDidMount () {
     if (this.state.showingInfoWindow) {
       this.setState({
        showingInfoWindow: false,
-       activeMarker: null,
+       animation: '0',
        icon: defaultIcon
       })
     }
@@ -103,14 +104,38 @@ updateQuery = (query) => {
     this.setState({ query: query })
      this.setState({
         showingInfoWindow: false,
-        activeMarker: null,
+       
         icon: defaultIcon,
 
       })
     this.updatesfindLocations(query)   
   }
 
-updatesfindLocations = (query) => {
+// Handle list item click/enter key
+  oneListClick = (props, e) => {
+    if (e.key === 'Enter' || !e.key) {
+      let clickedMarker;
+      if (document.querySelectorAll('.gmnoprint map area').length !== 0) {
+        clickedMarker = [...document.querySelectorAll('.gmnoprint map area')];
+      } else {
+        clickedMarker = [...document.querySelectorAll('.gmnoprint')];
+      }
+      clickedMarker = clickedMarker.find(marker =>  marker.getAttribute('title') === this.state.activeMarker === "" ? this.state.selectedPlace : this.state.activeMarker);
+      clickedMarker.click();
+        
+      
+      
+    }
+  }
+
+  onListClick = (e) => {
+    let click = [...document.querySelectorAll(".gmnoprint map area")];
+    click = click.find(marker => marker.title === this.state.activeMarker.title === "" ? this.state.selectedPlace.title : this.state.activeMarker.title);
+    click.click();
+  }
+
+   
+  updatesfindLocations = (query) => {
         //query interogation, look for books that match
         if (query) {
             //using maps display matching places
@@ -136,93 +161,10 @@ updatesfindLocations = (query) => {
     
      const {hasError } = this.state;
      
-     const {markerfl}=this.state.selectedPlace.id === "" ? {id : this.selectedPlace.id, position : this.selectedPlace.location, title: this.selectedPlace.title}: "";
-     
+       
      return (
      
-<<<<<<< HEAD
-      <div>
-    <Header/>
-    <div className="container">
-      <div className="options-box">
-        <h1>Find places on the map</h1>
-        
-         
-
-      <div className="input-wrapper">
-          <input
-            type="text"
-            placeholder="Find places on map"
-            aria-label="Find places on map"
-            onChange={e => this.updateQuery(e.target.value)}
-          />
-      </div>
-      <div className="filtered-places">
-        <ul className="filtered-list" tabIndex="0">
-          {
-        
-        this.state.venues.map(place =>
-              <li
-               
-                key={place.id}
-                className="result-item"
-                tabIndex="0"
-                id={place.id} 
-                onClick={e => this.onMarkerClick(place, e.target.value, e)}               
-                          
-              >
-                {place.name}
-          
-              </li>
-
-            )
-          }
-        </ul>
-        
-      </div>
-||||||| merged common ancestors
-      <div>
-    <Header/>
-    <div className="container">
-      <div className="options-box">
-        <h1>Find places on the map</h1>
-        
-         
-
-      <div className="input-wrapper">
-          <input
-            type="text"
-            placeholder="Find places on map"
-            aria-label="Find places on map"
-            onChange={e => this.updateQuery(e.target.value)}
-          />
-      </div>
-      <div className="filtered-places">
-        <ul className="filtered-list" tabIndex="0">
-          {
-        
-        this.state.venues.map(place =>
-              <li
-               
-                key={place.id}
-                className="result-item"
-                tabIndex="0"
-                id={place.id} 
-                onClick={e => this.onMarkerClick(place, null, e)}               
-                          
-              >
-                {place.name}
-          
-              </li>
-
-            )
-          }
-        </ul>
-        
-      </div>
-=======
      
->>>>>>> be8d9e899a8a2052799c7da3c6641bc680af15f0
     
     <div className="wrapper">
   <header className="header"><Header/></header>
@@ -242,11 +184,12 @@ updatesfindLocations = (query) => {
           lat: 45.039638,
           lng: 23.266628
           }}
-          zoom={15}
+          zoom={15}          
         >
         
      {this.state.venues.map(myMarker =>
         <Marker 
+          marker={this.state.oneListClick}
           key={myMarker.id}
           id={myMarker.id}
           onClick={this.onMarkerClick}
@@ -254,7 +197,7 @@ updatesfindLocations = (query) => {
           position={myMarker.location}
           title={myMarker.title}
           name={myMarker.name} 
-          animation={this.state.selectedPlace ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
+          animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
         > 
         </Marker>
       )} 
@@ -294,20 +237,24 @@ updatesfindLocations = (query) => {
           />
       </div>
       <div>
-        <ul className="filtered-list" tabIndex="0">
+        <ul id="list" className="filtered-list" tabIndex="0">
           {
         
         this.state.venues.map(place =>
-              <li ref="{this.state.marker}"
-               
-                key={place.id}
-                className="result-item"
-                tabIndex="0"
-                id={place.id}                
-               
-                onClick={e => this.onMarkerClick(place, this.state.marker, e)}                
+              <li  
+
+              className="result-item"
+              tabIndex="0"
+               key={place.referralId}
+              referralId={place.referralId}
+              venue={place.name}
+              onListClick={this.props.onListClick}
+              onClick={(e) => this.oneListClick(place.name, e.target)}
+                            
+                             
+            >                              
                           
-              >
+              
                 {place.name}
           
               </li>
