@@ -35,7 +35,15 @@ static propTypes = {
       infoLoaded: true,
       query: "",
       findPlaces: [],
+      markerfl: null,
+      hasError: false
     };
+  }
+
+  //Handles error catching
+  componentDidCatch(err) {
+    console.log("An error occured " + err);
+    this.setState({ hasError: true });
   }
 
   getLocations() {
@@ -53,7 +61,9 @@ componentDidMount () {
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
-      activeMarker: marker,
+
+      activeMarker: this.refs.marker,
+     
       showingInfoWindow: true,
       icon: logo,
      });
@@ -64,6 +74,7 @@ componentDidMount () {
       this.setState({
         showingInfoWindow: false,
         activeMarker: null,
+        selectedPlace: props,
         icon: defaultIcon,
         
       })
@@ -123,10 +134,13 @@ updatesfindLocations = (query) => {
   
   render() {
     
+     const {hasError } = this.state;
      
- 
+     const {markerfl}=this.state.selectedPlace.id === "" ? {id : this.selectedPlace.id, position : this.selectedPlace.location, title: this.selectedPlace.title}: "";
+     
      return (
      
+<<<<<<< HEAD
       <div>
     <Header/>
     <div className="container">
@@ -166,11 +180,62 @@ updatesfindLocations = (query) => {
         </ul>
         
       </div>
-    
-      </div>
+||||||| merged common ancestors
+      <div>
+    <Header/>
+    <div className="container">
+      <div className="options-box">
+        <h1>Find places on the map</h1>
+        
+         
 
-    <div id="map">
-          <Map
+      <div className="input-wrapper">
+          <input
+            type="text"
+            placeholder="Find places on map"
+            aria-label="Find places on map"
+            onChange={e => this.updateQuery(e.target.value)}
+          />
+      </div>
+      <div className="filtered-places">
+        <ul className="filtered-list" tabIndex="0">
+          {
+        
+        this.state.venues.map(place =>
+              <li
+               
+                key={place.id}
+                className="result-item"
+                tabIndex="0"
+                id={place.id} 
+                onClick={e => this.onMarkerClick(place, null, e)}               
+                          
+              >
+                {place.name}
+          
+              </li>
+
+            )
+          }
+        </ul>
+        
+      </div>
+=======
+     
+>>>>>>> be8d9e899a8a2052799c7da3c6641bc680af15f0
+    
+    <div className="wrapper">
+  <header className="header"><Header/></header>
+  <article className="main">
+    
+    {hasError ? (
+            window.alert(
+              "Something went wrong. Please check your Google Maps API key or internet connection and reload the browser"
+            )
+          ) : (
+            
+         
+          <Map 
           google={this.props.google}
           onClick={this.onMapClicked}
           initialCenter={{
@@ -181,19 +246,21 @@ updatesfindLocations = (query) => {
         >
         
      {this.state.venues.map(myMarker =>
-        <Marker key={myMarker.id}
+        <Marker 
+          key={myMarker.id}
           id={myMarker.id}
           onClick={this.onMarkerClick}
           icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
           position={myMarker.location}
           title={myMarker.title}
           name={myMarker.name} 
-          animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
+          animation={this.state.selectedPlace ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
         > 
         </Marker>
       )} 
       
         <InfoWindow 
+
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}         
           onClose={this.onInfoWindowClose}
@@ -210,12 +277,56 @@ updatesfindLocations = (query) => {
         </InfoWindow>       
 
       </Map>
-      
+       )}
+    
+  </article>
+  <aside className="aside aside-1">
+        <h1>Find places on the map</h1>
+        
+         
+
+      <div className="input-wrapper">
+          <input
+            type="text"
+            placeholder="Find places on map"
+            aria-label="Find places on map"
+            onChange={e => this.updateQuery(e.target.value)}
+          />
       </div>
-      
-    </div>
-    <Footer/>
-   </div>
+      <div>
+        <ul className="filtered-list" tabIndex="0">
+          {
+        
+        this.state.venues.map(place =>
+              <li ref="{this.state.marker}"
+               
+                key={place.id}
+                className="result-item"
+                tabIndex="0"
+                id={place.id}                
+               
+                onClick={e => this.onMarkerClick(place, this.state.marker, e)}                
+                          
+              >
+                {place.name}
+          
+              </li>
+
+            )
+          }
+        </ul>
+        
+      </div>
+    
+      </aside>
+
+  <footer className="footer"><Footer/></footer>
+</div>
+
+ 
+
+
+
     );
   }
 }
