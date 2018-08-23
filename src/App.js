@@ -154,7 +154,7 @@ updatesfindLocations = (query) => {
                 className="result-item"
                 tabIndex="0"
                 id={place.id} 
-                onClick={e => this.onMarkerClick(place, null, e)}               
+                onClick={e => this.onMarkerClick(place, e.target.value, e)}               
                           
               >
                 {place.name}
