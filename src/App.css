@@ -79,7 +79,7 @@ html,
   padding: 12px 0 5px 0;
   text-align: center;
   background-color: #ddd;
-  font-size: 20px;
+  font-size: 15px;
 }
 
 .main {
@@ -91,7 +91,9 @@ html,
 
  
 }
-
+.aside-1{
+  max-width: 300px;
+}
 
 .input-wrapper {
   height: 35px;
@@ -132,5 +134,8 @@ html,
   .main    { order: 2; } 
   .footer  { order: 4; }
 }
-
+@media all and (max-width: 800px) {
+   .aside-1 { max-width : 800px; } 
+  
+}
 

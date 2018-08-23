@@ -61,7 +61,9 @@ componentDidMount () {
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
-      activeMarker: marker,
+
+      activeMarker: this.refs.marker,
+     
       showingInfoWindow: true,
       icon: logo,
      });
@@ -72,6 +74,7 @@ componentDidMount () {
       this.setState({
         showingInfoWindow: false,
         activeMarker: null,
+        selectedPlace: props,
         icon: defaultIcon,
         
       })
@@ -132,7 +135,9 @@ updatesfindLocations = (query) => {
   render() {
     
      const {hasError } = this.state;
- 
+     
+     const {markerfl}=this.state.selectedPlace.id === "" ? {id : this.selectedPlace.id, position : this.selectedPlace.location, title: this.selectedPlace.title}: "";
+     
      return (
      
      
@@ -159,14 +164,15 @@ updatesfindLocations = (query) => {
         >
         
      {this.state.venues.map(myMarker =>
-        <Marker key={myMarker.id}
+        <Marker 
+          key={myMarker.id}
           id={myMarker.id}
           onClick={this.onMarkerClick}
           icon={this.state.selectedPlace.id === myMarker.id ? this.state.icon : defaultIcon }
           position={myMarker.location}
           title={myMarker.title}
           name={myMarker.name} 
-          animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
+          animation={this.state.selectedPlace ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
         > 
         </Marker>
       )} 
@@ -210,14 +216,14 @@ updatesfindLocations = (query) => {
           {
         
         this.state.venues.map(place =>
-              <li
+              <li ref="{this.state.marker}"
                
                 key={place.id}
                 className="result-item"
                 tabIndex="0"
                 id={place.id}                
-                
-                onClick={e => this.onMarkerClick(place, null, e)}               
+               
+                onClick={e => this.onMarkerClick(place, this.state.marker, e)}                
                           
               >
                 {place.name}
