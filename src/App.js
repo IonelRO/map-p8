@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import logo from './media/camera.svg';
 import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
-import PropTypes from 'prop-types';
 import * as maps from './maps.js';
 import Header from './Header.js';
 import Footer from './Footer.js';
@@ -48,6 +47,7 @@ static propTypes = {
     this.setState({ hasError: true });
   }
 
+  //Get information about map location using foursquare.API
   getLocations() {
         maps.getLocationsAll()
         .then(venues => {
@@ -59,30 +59,26 @@ static propTypes = {
 componentDidMount () {
   this.getLocations()
 }
-
+ // On Clik marker function
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
-
       activeMarker: marker,
-     
       showingInfoWindow: true,
       icon: logo,
      });
   };
- 
+  // On Clik list function
   onListClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
-
       activeMarker: marker,
-     
       showingInfoWindow: true,
       icon: logo,
      });
   };
 
- 
+  // On map click function
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
@@ -95,6 +91,7 @@ componentDidMount () {
     }
   };
 
+  // On mouseover marker function
   onMouseoverMarker(props, marker, e) {
       this.setState({
       selectedPlace: props,
@@ -103,7 +100,7 @@ componentDidMount () {
     
     });
   };
- 
+  // On InfoWindow Close marker function
   onInfoWindowClose= (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
@@ -113,7 +110,9 @@ componentDidMount () {
       })
     }
   };
-updateQuery = (query) => {
+
+  // Update locations list
+  updateQuery = (query) => {
     this.setState({ query: query })
      this.setState({
         showingInfoWindow: false,
@@ -124,8 +123,9 @@ updateQuery = (query) => {
     this.updatesfindLocations(query)   
   }
 
-updatesfindLocations = (query) => {
-        //query interogation, look for books that match
+  // Finnd locations list
+  updatesfindLocations = (query) => {
+        //query interogation, look for locations that match
         if (query) {
             //using maps display matching places
             maps.getSelectedAll(query).then((findPlaces) => {
@@ -134,7 +134,7 @@ updatesfindLocations = (query) => {
                 if (findPlaces.error) {
                     this.setState({ findPlaces: [] })
                 } else {
-                //in books math with query then it are displayed
+                //in location math with query then it are displayed
                     this.setState({ findPlaces: findPlaces })
                     this.setState({ venues: findPlaces })
                     
@@ -153,11 +153,10 @@ updatesfindLocations = (query) => {
      
      return (
      
-     
-    
-    <div className="wrapper">
+  // HTML content    
+  <div className="wrapper">
   <header className="header"><Header/></header>
-  <article className="main">
+    <article className="main">
     
     {hasError ? (
             window.alert(
@@ -165,7 +164,7 @@ updatesfindLocations = (query) => {
             )
           ) : (
             
-         
+          
           <Map 
           google={this.props.google}
           onClick={this.onMapClicked}
@@ -186,8 +185,8 @@ updatesfindLocations = (query) => {
           position={myMarker.location}
           title={myMarker.title}
           name={myMarker.name} 
-          animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
-         
+          animation={this.state.activeMarker ? (this.state.selectedPlace.id === myMarker.id ? '1' : '0') : '0'}
+
         > 
         </Marker>
       )} 
@@ -255,7 +254,7 @@ updatesfindLocations = (query) => {
       </aside>
 
   <footer className="footer"><Footer/></footer>
-</div>
+  </div>
 
  
 
@@ -265,7 +264,7 @@ updatesfindLocations = (query) => {
   }
 }
 
-
+    // Google api calling
     export default GoogleApiWrapper({
       apiKey: "AIzaSyB7Ma3Ggl2TFUdsMaW8E4_F62uR65DPHZQ",
       v: "3.30"

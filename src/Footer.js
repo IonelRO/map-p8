@@ -3,9 +3,7 @@ import React, {Component} from 'react';
 
 
 class Footer extends Component {
-
 render() {
-
 return(
       <footer tabIndex={0}>
           		 Project by Dobre Ionel for the Udacity FEND Nanodegree. Integrated with
