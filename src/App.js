@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './media/camera.svg';
 import defaultIcon from './media/map-marker.svg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import PropTypes from 'prop-types';
 import * as maps from './maps.js';
 import Header from './Header.js';
 import Footer from './Footer.js';
@@ -27,8 +28,6 @@ static propTypes = {
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
-    let marker = React.createRef();
-      
     
     this.state = {
       showingInfoWindow: false,
@@ -37,8 +36,9 @@ static propTypes = {
       venues: [],      
       infoLoaded: true,
       query: "",
-      findPlaces: [],    
-      hasError: false,
+      findPlaces: [],
+      markerfl: null,
+      hasError: false
     };
   }
 
@@ -63,18 +63,31 @@ componentDidMount () {
   onMarkerClick(props, marker, e) {
     this.setState({
       selectedPlace: props,
+
       activeMarker: marker,
+     
       showingInfoWindow: true,
       icon: logo,
      });
-   
   };
+ 
+  onListClick(props, marker, e) {
+    this.setState({
+      selectedPlace: props,
+
+      activeMarker: marker,
+     
+      showingInfoWindow: true,
+      icon: logo,
+     });
+  };
+
  
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
         showingInfoWindow: false,
-       
+        activeMarker: null,
         selectedPlace: props,
         icon: defaultIcon,
         
@@ -87,7 +100,7 @@ componentDidMount () {
       selectedPlace: props,
       activeMarker: marker,
       icon: defaultIcon
-      
+    
     });
   };
  
@@ -95,7 +108,7 @@ componentDidMount () {
     if (this.state.showingInfoWindow) {
       this.setState({
        showingInfoWindow: false,
-       animation: '0',
+       activeMarker: null,
        icon: defaultIcon
       })
     }
@@ -104,38 +117,14 @@ updateQuery = (query) => {
     this.setState({ query: query })
      this.setState({
         showingInfoWindow: false,
-       
+        activeMarker: null,
         icon: defaultIcon,
 
       })
     this.updatesfindLocations(query)   
   }
 
-// Handle list item click/enter key
-  oneListClick = (props, e) => {
-    if (e.key === 'Enter' || !e.key) {
-      let clickedMarker;
-      if (document.querySelectorAll('.gmnoprint map area').length !== 0) {
-        clickedMarker = [...document.querySelectorAll('.gmnoprint map area')];
-      } else {
-        clickedMarker = [...document.querySelectorAll('.gmnoprint')];
-      }
-      clickedMarker = clickedMarker.find(marker =>  marker.getAttribute('title') === this.state.activeMarker === "" ? this.state.selectedPlace : this.state.activeMarker);
-      clickedMarker.click();
-        
-      
-      
-    }
-  }
-
-  onListClick = (e) => {
-    let click = [...document.querySelectorAll(".gmnoprint map area")];
-    click = click.find(marker => marker.title === this.state.activeMarker.title === "" ? this.state.selectedPlace.title : this.state.activeMarker.title);
-    click.click();
-  }
-
-   
-  updatesfindLocations = (query) => {
+updatesfindLocations = (query) => {
         //query interogation, look for books that match
         if (query) {
             //using maps display matching places
@@ -159,9 +148,9 @@ updateQuery = (query) => {
   
   render() {
     
-     const {hasError } = this.state;
+     const {hasError } = this.state;     
+    
      
-       
      return (
      
      
@@ -184,12 +173,12 @@ updateQuery = (query) => {
           lat: 45.039638,
           lng: 23.266628
           }}
-          zoom={15}          
+          zoom={15}
         >
         
      {this.state.venues.map(myMarker =>
         <Marker 
-          marker={this.state.oneListClick}
+          ondomready={this.onListClick}
           key={myMarker.id}
           id={myMarker.id}
           onClick={this.onMarkerClick}
@@ -198,6 +187,7 @@ updateQuery = (query) => {
           title={myMarker.title}
           name={myMarker.name} 
           animation={this.state.activeMarker ? (myMarker.id === this.state.selectedPlace.id ? '1' : '0') : '0'}
+         
         > 
         </Marker>
       )} 
@@ -206,6 +196,7 @@ updateQuery = (query) => {
 
           marker={this.state.activeMarker}
           visible={this.state.showingInfoWindow}         
+          position={this.state.selectedPlace.location}
           onClose={this.onInfoWindowClose}
         >
            <div key={this.state.selectedPlace.id}>                    
@@ -237,24 +228,20 @@ updateQuery = (query) => {
           />
       </div>
       <div>
-        <ul id="list" className="filtered-list" tabIndex="0">
+        <ul className="filtered-list" tabIndex="0">
           {
         
         this.state.venues.map(place =>
-              <li  
-
-              className="result-item"
-              tabIndex="0"
-               key={place.referralId}
-              referralId={place.referralId}
-              venue={place.name}
-              onListClick={this.props.onListClick}
-              onClick={(e) => this.oneListClick(place.name, e.target)}
-                            
-                             
-            >                              
+              <li 
+               
+                key={place.id}
+                className="result-item"
+                tabIndex="0"
+                id={place.id}                
+               
+                onClick={e => this.onListClick(place, this.marker, e)}                
                           
-              
+              >
                 {place.name}
           
               </li>
