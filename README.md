@@ -20,7 +20,9 @@ In this project, students have to develop a single page application featuring a 
 * `git clone https://github.com/IonelRO/map-p8`
 * `cd Neighborhood-Map`
 * `npm install`
+* `npm install --save google-maps-react`
 * `npm start`
+
 * open `http://localhost:3000`
 
 ### Run with Service Worker

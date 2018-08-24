@@ -9,30 +9,19 @@ import './App.css';
 
 
 class App extends Component {
-static propTypes = {
-  }
-  state = {
-    imageSrc: {}, 
-    venueDetails: {},
-    detailsString: '',
-    success: false,
-    infoLoaded: false,
-    flickrImgimages: [],
-    selectedPlace: "",
-
-  }
   
   constructor(props) {
     super(props);
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
     this.onMouseoverMarker = this.onMouseoverMarker.bind(this);
-    
+    this.state = { error: null, errorInfo: null };
     this.state = {
       showingInfoWindow: false,
       selectedPlace: "",
       activeMarker: {},
-      venues: [],      
+      venues: [], 
+      success: false,     
       infoLoaded: true,
       query: "",
       findPlaces: [],
@@ -42,9 +31,12 @@ static propTypes = {
   }
 
   //Handles error catching
-  componentDidCatch(err) {
-    console.log("An error occured " + err);
-    this.setState({ hasError: true });
+  componentDidCatch(error, errorInfo) {
+    console.log("An error occured " + error);
+    this.setState({ 
+      error: error,
+      errorInfo: errorInfo
+    });
   }
 
   //Get information about map location using foursquare.API
@@ -54,6 +46,7 @@ static propTypes = {
         this.setState({ venues: venues })       
           
   })
+        .catch(error => this.componentDidCatch(error, error.toString()))
   }  
    
 componentDidMount () {
@@ -131,15 +124,13 @@ componentDidMount () {
             maps.getSelectedAll(query).then((findPlaces) => {
                 //check if search query doesn't exist or generate error, then no results, empty array               
                 //Reference: https://dev.to/sarah_chima/error-boundaries-in-react-3eib
-                if (findPlaces.error) {
-                    this.setState({ findPlaces: [] })
-                } else {
-                //in location math with query then it are displayed
+                               //in location math with query then it are displayed
                     this.setState({ findPlaces: findPlaces })
                     this.setState({ venues: findPlaces })
                     
-                }
+               
             })
+            .catch(error => this.componentDidCatch(error, error.toString()))
             //no query shows us no results, empty array
         } else {
             this.setState({ findPlaces: [] })
@@ -147,9 +138,18 @@ componentDidMount () {
     }
   
   render() {
-    
-     const {hasError } = this.state;     
-    
+       
+      if (this.state.errorInfo) {
+      // Error path
+      return (
+        <div>
+          <h2>Something went wrong.</h2>
+          <details style={{ whiteSpace: 'pre-wrap' }}>                     
+            {this.state.error.stack}
+          </details>
+        </div>
+      );
+    }
      
      return (
      
@@ -158,11 +158,7 @@ componentDidMount () {
   <header className="header"><Header/></header>
     <article className="main">
     
-    {hasError ? (
-            window.alert(
-              "Something went wrong. Please check your Google Maps API key or internet connection and reload the browser"
-            )
-          ) : (
+    { (
             
           
           <Map 

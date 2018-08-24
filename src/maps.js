@@ -18,7 +18,7 @@ export const getLocationsAll = () =>
     .then(handleErrors)
    .then(res => res.json())
     .then(data => data.response.venues)
-   .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
+   .catch(error => {throw Error("Error While getting All Locations data from FourSquare API")})
 
 // Get locations using query interogation
 export const getSelectedAll = (query) =>
@@ -26,8 +26,7 @@ export const getSelectedAll = (query) =>
     .then(handleErrors)
    .then(res => res.json())
     .then(data => data.response.venues)
-   .catch(error => {console.log('Error While getting All Locations data from FourSquare API', error)})
-
+   .catch(error => {throw Error("Error While getting All Locations data from FourSquare API")})
 
 
 
